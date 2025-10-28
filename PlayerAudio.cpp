@@ -1,4 +1,4 @@
-﻿#include "PlayerAudio.h"
+#include "PlayerAudio.h"
 #include <JuceHeader.h>
 PlayerAudio::PlayerAudio()
 {
