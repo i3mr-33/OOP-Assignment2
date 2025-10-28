@@ -37,6 +37,7 @@ private:
 	juce::Slider positionSlider;
 	juce::Label currentTimeLabel;
     juce::Label totalTimeLabel;
+    juce::Label test;
 
     std::unique_ptr<juce::FileChooser> fileChooser;
 
