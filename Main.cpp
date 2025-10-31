@@ -1,4 +1,4 @@
-#include <JuceHeader.h>
+﻿#include <JuceHeader.h>
 #include "MainComponent.h"
 
 // Our application class
@@ -46,3 +46,4 @@ private:
 
 // This macro starts the app
 START_JUCE_APPLICATION(SimpleAudioPlayer)
+// test update
