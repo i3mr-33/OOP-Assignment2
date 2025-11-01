@@ -27,6 +27,8 @@ public:
 	void toggleMute();
     bool isMuted();
 	float getPrevGain() const;
+    void setPlaybackSpeed(double ratio);
+    double getCurrentSpeed() const;
 private:
     
     bool looping = false;
@@ -36,6 +38,7 @@ private:
     juce::AudioFormatManager formatManager;
     std::unique_ptr<juce::AudioFormatReaderSource> readerSource;
     juce::AudioTransportSource transportSource;
+    juce::ResamplingAudioSource resampleSource{ &transportSource , false };
 
     // JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PlayerAudio)
 };
