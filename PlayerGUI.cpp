@@ -1,4 +1,4 @@
-#include "PlayerGUI.h"
+﻿#include "PlayerGUI.h"
 #include <JuceHeader.h>
 PlayerGUI::PlayerGUI()
 {
