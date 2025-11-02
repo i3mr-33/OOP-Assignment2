@@ -27,6 +27,13 @@ public:
 	void toggleMute();
     bool isMuted();
 	float getPrevGain() const;
+    void addToPlaylist(const juce::Array<juce::File>& files);  
+    void playNext();                                         
+    void playPrevious();                                        
+    int getCurrentIndex() const;                              
+    juce::File getCurrentFile() const;
+    std::function<void(const juce::File&)> onFileChanged;
+
 private:
     
     bool looping = false;
@@ -36,6 +43,10 @@ private:
     juce::AudioFormatManager formatManager;
     std::unique_ptr<juce::AudioFormatReaderSource> readerSource;
     juce::AudioTransportSource transportSource;
+    juce::Array<juce::File> playlist;  
+    int currentIndex = -1; 
+  
+
 
     // JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PlayerAudio)
 };

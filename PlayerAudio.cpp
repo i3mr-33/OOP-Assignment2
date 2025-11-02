@@ -121,3 +121,63 @@ float PlayerAudio::getGain() const
 {
     return transportSource.getGain();
 }
+
+
+void PlayerAudio::addToPlaylist(const juce::Array<juce::File>& files)
+{
+    for (auto& file : files)
+        playlist.add(file);
+
+    if (currentIndex == -1 && playlist.size() > 0)
+    {
+        currentIndex = 0;
+        loadFile(playlist[currentIndex]);
+    }
+}
+
+void PlayerAudio::playNext()
+{
+    if (playlist.isEmpty())
+        return;
+
+    currentIndex++;
+    if (currentIndex >= playlist.size())
+        currentIndex = 0; 
+
+    loadFile(playlist[currentIndex]);
+    start();
+    if (onFileChanged)
+        onFileChanged(playlist[currentIndex]);
+}
+
+void PlayerAudio::playPrevious()
+{
+    if (playlist.isEmpty())
+        return;
+
+    currentIndex--;
+    if (currentIndex < 0)
+        currentIndex = playlist.size() - 1; 
+
+    loadFile(playlist[currentIndex]);
+    start();
+    if (onFileChanged)
+        onFileChanged(playlist[currentIndex]);
+}
+
+int PlayerAudio::getCurrentIndex() const
+{
+    return currentIndex;
+}
+
+juce::File PlayerAudio::getCurrentFile() const
+{
+    if (currentIndex >= 0 && currentIndex < playlist.size())
+        return playlist[currentIndex];
+
+    return juce::File(); 
+}
+
+
+
+

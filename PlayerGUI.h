@@ -5,7 +5,8 @@
 class PlayerGUI : public juce::Component,
     public juce::Button::Listener,
     public juce::Slider::Listener,
-	public juce::Timer
+	public juce::Timer ,
+    public juce::ListBoxModel
 {
 public:
     PlayerGUI();
@@ -21,6 +22,11 @@ public:
     void sliderValueChanged(juce::Slider* slider) override;
 	void timerCallback()override;
 	void positionSliderSetVBounds();
+    void loadFile(const juce::File& file);
+    int getNumRows() override;
+    void paintListBoxItem(int rowNumber, juce::Graphics& g,
+        int width, int height, bool rowIsSelected) override;
+    void updateMetaDataLabel(const juce::File& file);
 
 private:
     PlayerAudio playerAudio;
@@ -38,6 +44,15 @@ private:
 	juce::Label currentTimeLabel;
     juce::Label totalTimeLabel;
     juce::Label test;
+    juce::Label metaDataLabel; 
+    juce::TextButton nextButton{ juce:: CharPointer_UTF8(u8"▶️") };
+    juce::TextButton prevButton{juce:: CharPointer_UTF8(u8"◀️" )};
+    juce::ListBox playlistBox;  
+    juce::StringArray playlistItems; 
+    juce::TextButton forwardButton{ juce::CharPointer_UTF8(u8"⏩") }; 
+    juce::TextButton backwardButton{ juce::CharPointer_UTF8(u8"⏪") };
+
+  
 
     std::unique_ptr<juce::FileChooser> fileChooser;
 
