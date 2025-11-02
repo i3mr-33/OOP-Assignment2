@@ -28,6 +28,11 @@ PlayerGUI::PlayerGUI()
 	totalTimeLabel.setText("00:00", juce::dontSendNotification);
 	totalTimeLabel.setJustificationType(juce::Justification::centred);
 	addAndMakeVisible(totalTimeLabel);
+    speedSlider.setRange(0.5, 2.0, 0.01);
+    speedSlider.setValue(1.0);
+    speedSlider.setTextValueSuffix("x Speed");
+    speedSlider.addListener(this);
+    addAndMakeVisible(speedSlider);
 }
 PlayerGUI::~PlayerGUI()
 {
@@ -80,6 +85,7 @@ void PlayerGUI::resized()
 	setAButton.setBounds(15, y, 80, 40);
 	setBButton.setBounds(115, y, 80, 40);
 	abLoopButton.setBounds(215, y, 80, 40);
+    speedSlider.setBounds(20, 80, getWidth() - 40, 30);
 }
 void PlayerGUI::buttonClicked(juce::Button* button)
 {
@@ -185,6 +191,13 @@ void PlayerGUI::sliderValueChanged(juce::Slider* slider)
 
         currentTimeLabel.setText(timeString, juce::dontSendNotification);
 	}
+    else if (slider == &speedSlider)
+    {
+        double newSpeed = speedSlider.getValue();
+        playerAudio.setPlaybackSpeed(newSpeed);
+        stopTimer();
+        startTimerHz((int)(30.0 * newSpeed));
+    }
 }
 void PlayerGUI::timerCallback()
 {
