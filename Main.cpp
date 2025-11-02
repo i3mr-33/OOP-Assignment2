@@ -45,4 +45,9 @@ private:
 };
 
 // This macro starts the app
+<<<<<<< HEAD
 START_JUCE_APPLICATION(SimpleAudioPlayer)
+=======
+START_JUCE_APPLICATION(SimpleAudioPlayer)
+
+>>>>>>> 1795caaf87817c44abc1d4a538af64b25ae5cabb
