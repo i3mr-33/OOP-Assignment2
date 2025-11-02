@@ -27,8 +27,15 @@ public:
 	void toggleMute();
     bool isMuted();
 	float getPrevGain() const;
-private:
+    void setLoopA();
+	void setLoopB();
+	void toggleABLooping();
+	bool isABLooping() const;
     
+private:
+	double loopStart = 0.0;
+	double loopEnd = 0.0;
+	bool isABLoopingvar = false;
     bool looping = false;
     bool running = true;
     float previousGain = 0.5f;

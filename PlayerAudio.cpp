@@ -1,4 +1,4 @@
-#include "PlayerAudio.h"
+﻿#include "PlayerAudio.h"
 #include <JuceHeader.h>
 PlayerAudio::PlayerAudio()
 {
@@ -120,4 +120,24 @@ float PlayerAudio::getPrevGain() const
 float PlayerAudio::getGain() const
 {
     return transportSource.getGain();
+}
+void PlayerAudio::setLoopA()
+{
+    loopStart = getPosition();
+}
+void PlayerAudio::setLoopB()
+{
+    loopEnd = getPosition();
+    if (loopEnd > loopStart)
+    {
+        isABLoopingvar = true;
+    }
+}
+void PlayerAudio::toggleABLooping()
+{
+	isABLoopingvar = !isABLoopingvar;
+}
+bool PlayerAudio::isABLooping() const
+{
+    return isABLoopingvar;
 }

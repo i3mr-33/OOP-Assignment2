@@ -3,7 +3,7 @@
 PlayerGUI::PlayerGUI()
 {
     // Add buttons
-    for (auto* btn : { &loadButton, &loopButton, &playButton, &goToStartButton, &goToEndButton, &muteButton })
+    for (auto* btn : { &loadButton, &loopButton, &playButton, &goToStartButton, &goToEndButton, &muteButton, &setAButton, &setBButton, &abLoopButton })
     {
         btn->addListener(this);
         addAndMakeVisible(btn);
@@ -77,6 +77,9 @@ void PlayerGUI::resized()
     volumeSlider.setBounds(20, getHeight() / 2 + 200, getWidth() - 40, 30);
 	currentTimeLabel.setBounds(10, getHeight() / 2 + 100, 60, 30);
 	totalTimeLabel.setBounds(getWidth() - 70, getHeight() / 2 + 100, 60, 30);
+	setAButton.setBounds(15, y, 80, 40);
+	setBButton.setBounds(115, y, 80, 40);
+	abLoopButton.setBounds(215, y, 80, 40);
 }
 void PlayerGUI::buttonClicked(juce::Button* button)
 {
@@ -145,6 +148,22 @@ void PlayerGUI::buttonClicked(juce::Button* button)
             volumeSlider.setValue(0.0f);
         }
     }
+    else if(button == &setAButton)
+    {
+        playerAudio.setLoopA();
+    }
+    else if (button == &setBButton)
+    {
+        playerAudio.setLoopB();
+    }
+    else if (button == &abLoopButton)
+    {
+        playerAudio.toggleABLooping();
+        if (playerAudio.isABLooping())
+            abLoopButton.setColour(juce::TextButton::buttonColourId, juce::Colours::darkred);
+		else
+		abLoopButton.setColour(juce::TextButton::buttonColourId, juce::Colours::darkcyan);
+	}
 }
 void PlayerGUI::paint(juce::Graphics& g)
 {

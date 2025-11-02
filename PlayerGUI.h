@@ -38,6 +38,9 @@ private:
 	juce::Label currentTimeLabel;
     juce::Label totalTimeLabel;
     juce::Label test;
+	juce::TextButton setAButton{ "Set A" };
+	juce::TextButton setBButton{ "Set B" };
+	juce::TextButton abLoopButton{ "A-B Loop" };
 
     std::unique_ptr<juce::FileChooser> fileChooser;
 
