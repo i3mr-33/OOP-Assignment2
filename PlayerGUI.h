@@ -44,6 +44,7 @@ private:
 	juce::Label currentTimeLabel;
     juce::Label totalTimeLabel;
     juce::Label test;
+
     juce::Label metaDataLabel; 
     juce::TextButton nextButton{ juce:: CharPointer_UTF8(u8"▶️") };
     juce::TextButton prevButton{juce:: CharPointer_UTF8(u8"◀️" )};
@@ -54,6 +55,12 @@ private:
 
   
 
+	juce::TextButton setAButton{ "Set A" };
+	juce::TextButton setBButton{ "Set B" };
+	juce::TextButton abLoopButton{ "A-B Loop" };
+
+
+    juce::Slider speedSlider;
     std::unique_ptr<juce::FileChooser> fileChooser;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PlayerGUI)

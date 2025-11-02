@@ -1,9 +1,9 @@
-﻿#include"PlayerGUI.h"
+#include "PlayerGUI.h"
 #include <JuceHeader.h>
 PlayerGUI::PlayerGUI()
 {
     // Add buttons
-    for (auto* btn : { &loadButton, &loopButton, &playButton, &goToStartButton, &goToEndButton, &muteButton ,&nextButton, &prevButton , &forwardButton , &backwardButton})
+    for (auto* btn : { &loadButton, &loopButton, &playButton, &goToStartButton, &goToEndButton, &muteButton ,&nextButton, &prevButton , &forwardButton , &backwardButton , &setAButton, &setBButton, &abLoopButton })
     {
         btn->addListener(this);
         addAndMakeVisible(btn);
@@ -30,6 +30,11 @@ PlayerGUI::PlayerGUI()
     totalTimeLabel.setText("00:00", juce::dontSendNotification);
     totalTimeLabel.setJustificationType(juce::Justification::centred);
     addAndMakeVisible(totalTimeLabel);
+    speedSlider.setRange(0.5, 2.0, 0.01);
+    speedSlider.setValue(1.0);
+    speedSlider.setTextValueSuffix("x Speed");
+    speedSlider.addListener(this);
+    addAndMakeVisible(speedSlider);
 
     metaDataLabel.setJustificationType(juce::Justification::topLeft);
     metaDataLabel.setColour(juce::Label::textColourId, juce::Colours::white);
@@ -116,6 +121,11 @@ void PlayerGUI::resized()
     prevButton.setBounds(getWidth() - 160, 60, 60, 40);
     nextButton.setBounds(getWidth() - 80, 60, 60, 40);
     playlistBox.setBounds(getWidth() - 160, 120, 140, 100);
+
+    setAButton.setBounds(15, y, 80, 40);
+    setBButton.setBounds(115, y, 80, 40);
+    abLoopButton.setBounds(215, y, 80, 40);
+    speedSlider.setBounds(20, 80, getWidth() - 40, 30);
 }
 
 
@@ -256,6 +266,22 @@ void PlayerGUI::buttonClicked(juce::Button* button)
             newPosition = 0.0; 
         playerAudio.setPosition(newPosition);
     }
+    else if (button == &setAButton)
+    {
+        playerAudio.setLoopA();
+    }
+    else if (button == &setBButton)
+    {
+        playerAudio.setLoopB();
+    }
+    else if (button == &abLoopButton)
+    {
+        playerAudio.toggleABLooping();
+        if (playerAudio.isABLooping())
+            abLoopButton.setColour(juce::TextButton::buttonColourId, juce::Colours::darkred);
+        else
+            abLoopButton.setColour(juce::TextButton::buttonColourId, juce::Colours::darkcyan);
+    }
 }
 
 void PlayerGUI::paint(juce::Graphics& g)
@@ -277,6 +303,13 @@ void PlayerGUI::sliderValueChanged(juce::Slider* slider)
         juce::String timeString = std::to_string(minutes) + " : " + std::to_string(seconds);
 
         currentTimeLabel.setText(timeString, juce::dontSendNotification);
+    }
+    else if (slider == &speedSlider)
+    {
+        double newSpeed = speedSlider.getValue();
+        playerAudio.setPlaybackSpeed(newSpeed);
+        stopTimer();
+        startTimerHz((int)(30.0 * newSpeed));
     }
 }
 void PlayerGUI::timerCallback()
@@ -303,4 +336,3 @@ void PlayerGUI::positionSliderSetVBounds()
 {
     positionSlider.setRange(0, playerAudio.getLength(), 1);
 }  
-

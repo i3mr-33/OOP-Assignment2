@@ -1,4 +1,4 @@
-#include "PlayerAudio.h"
+﻿#include "PlayerAudio.h"
 #include <JuceHeader.h>
 PlayerAudio::PlayerAudio()
 {
@@ -10,11 +10,12 @@ PlayerAudio::~PlayerAudio()
 void PlayerAudio::prepareToPlay(int samplesPerBlockExpected, double sampleRate)
 {
     transportSource.prepareToPlay(samplesPerBlockExpected, sampleRate);
+    resampleSource.prepareToPlay(samplesPerBlockExpected, sampleRate);
 }
 
 void PlayerAudio::getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill)
 {
-    transportSource.getNextAudioBlock(bufferToFill);
+    resampleSource.getNextAudioBlock(bufferToFill);
     
     if (looping)
     {
@@ -29,6 +30,10 @@ void PlayerAudio::getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferTo
 void PlayerAudio::releaseResources()
 {
     transportSource.releaseResources();
+}
+void PlayerAudio::setPlaybackSpeed(double ratio)
+{
+    resampleSource.setResamplingRatio(ratio);
 }
 bool PlayerAudio::loadFile(const juce::File& file)
 {
@@ -73,6 +78,12 @@ void PlayerAudio::setPosition(double pos)
 double PlayerAudio::getPosition() const
 {
     return transportSource.getCurrentPosition();
+}
+double PlayerAudio::getCurrentSpeed() const
+{
+    double normalPosition = transportSource.getCurrentPosition();
+    double speedRatio = resampleSource.getResamplingRatio();
+    return resampleSource.getResamplingRatio();
 }
 double PlayerAudio::getLength() const
 {
@@ -121,6 +132,7 @@ float PlayerAudio::getGain() const
 {
     return transportSource.getGain();
 }
+
 
 
 void PlayerAudio::addToPlaylist(const juce::Array<juce::File>& files)
@@ -180,4 +192,26 @@ juce::File PlayerAudio::getCurrentFile() const
 
 
 
+
+
+void PlayerAudio::setLoopA()
+{
+    loopStart = getPosition();
+}
+void PlayerAudio::setLoopB()
+{
+    loopEnd = getPosition();
+    if (loopEnd > loopStart)
+    {
+        isABLoopingvar = true;
+    }
+}
+void PlayerAudio::toggleABLooping()
+{
+	isABLoopingvar = !isABLoopingvar;
+}
+bool PlayerAudio::isABLooping() const
+{
+    return isABLoopingvar;
+}
 
