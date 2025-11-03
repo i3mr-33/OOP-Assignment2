@@ -41,8 +41,9 @@ public:
 	bool isABLooping() const;
     void setPlaybackSpeed(double ratio);
     double getCurrentSpeed() const;
-
-    
+    double getCurrentPositionSeconds() const;
+    double getTotalLengthSeconds() const;
+    juce::AudioThumbnail& getThumbnail() { return thumbnail; }
 private:
 	double loopStart = 0.0;
 	double loopEnd = 0.0;
@@ -62,6 +63,7 @@ private:
 
     juce::ResamplingAudioSource resampleSource{ &transportSource , false };
 
-
+    juce::AudioThumbnailCache thumbnailCache{ 5 };
+    juce::AudioThumbnail thumbnail{ 512, formatManager, thumbnailCache };
     // JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PlayerAudio)
 };

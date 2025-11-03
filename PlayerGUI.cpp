@@ -50,7 +50,6 @@ PlayerGUI::~PlayerGUI()
 void PlayerGUI::prepareToPlay(int samplesPerBlockExpected, double sampleRate)
 {
     playerAudio.prepareToPlay(samplesPerBlockExpected, sampleRate);
-
 }
 void PlayerGUI::getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill)
 {
@@ -113,10 +112,10 @@ void PlayerGUI::resized()
     goToEndButton.setBounds(x + 125, y, 70, 40);     
     forwardButton.setBounds(x + 45, y, 70, 40);    
 
-    positionSlider.setBounds(65, getHeight() / 2 + 100, getWidth() - 130, 30);
-    volumeSlider.setBounds(20, getHeight() / 2 + 200, getWidth() - 40, 30);
-    currentTimeLabel.setBounds(10, getHeight() / 2 + 100, 60, 30);
-    totalTimeLabel.setBounds(getWidth() - 70, getHeight() / 2 + 100, 60, 30);
+    positionSlider.setBounds(65, getHeight() / 2 + 100, getWidth() - 130, 100);
+    volumeSlider.setBounds(20, getHeight() / 2 + 210, getWidth() - 40, 30);
+    currentTimeLabel.setBounds(10, getHeight() / 2 + 100, 60, 100);
+    totalTimeLabel.setBounds(getWidth() - 70, getHeight() / 2 + 100, 60, 100);
     metaDataLabel.setBounds(15, 80, 250, 80);
     prevButton.setBounds(getWidth() - 160, 60, 60, 40);
     nextButton.setBounds(getWidth() - 80, 60, 60, 40);
@@ -126,6 +125,7 @@ void PlayerGUI::resized()
     setBButton.setBounds(115, y, 80, 40);
     abLoopButton.setBounds(215, y, 80, 40);
     speedSlider.setBounds(20, 80, getWidth() - 40, 30);
+    
 }
 
 
@@ -197,6 +197,13 @@ void PlayerGUI::buttonClicked(juce::Button* button)
 
                     // Set position slider range
                     positionSlider.setRange(0, playerAudio.getLength(), 1);
+                    // Update Total Time
+                    double totalLength = playerAudio.getLength();
+                    int totalMinutes = (int)totalLength / 60;
+                    int totalSecondsInt = (int)totalLength % 60;
+                    totalTimeLabel.setText(
+                        juce::String::formatted("%02d:%02d", totalMinutes, totalSecondsInt),
+                        juce::dontSendNotification);
                 }
             });
     }
@@ -287,7 +294,29 @@ void PlayerGUI::buttonClicked(juce::Button* button)
 void PlayerGUI::paint(juce::Graphics& g)
 {
     g.fillAll(juce::Colours::darkgrey);
+    auto waveformBounds = positionSlider.getBounds();
+    if (playerAudio.getThumbnail().isFullyLoaded())
+    {
+        g.setColour(juce::Colours::cyan);
+        playerAudio.getThumbnail().drawChannel(
+            g,
+            waveformBounds.reduced(2),
+            0.0,
+            playerAudio.getLength(),
+            0,
+            1.0f
+        );
+    }
+    double totalLength = playerAudio.getLength();
+    if (totalLength > 0.0)
+    {
+        float progress = (float)(playerAudio.getPosition() / totalLength);
+        int xPosition = waveformBounds.getX() + (int)(waveformBounds.getWidth() * progress);
+        g.setColour(juce::Colours::red);
+        g.drawLine(xPosition, waveformBounds.getY(), xPosition, waveformBounds.getBottom(), 2.0f); // سمك 2 بكسل
+    }
 }
+
 
 void PlayerGUI::sliderValueChanged(juce::Slider* slider)
 {
@@ -314,23 +343,24 @@ void PlayerGUI::sliderValueChanged(juce::Slider* slider)
 }
 void PlayerGUI::timerCallback()
 {
-    if (playerAudio.isRunning())
+    double totalLength = playerAudio.getLength();
+    if (totalLength > 0.0)
     {
-        positionSlider.setValue(playerAudio.getPosition(), juce::dontSendNotification);
-        double value = positionSlider.getValue();
-        int totalSeconds = int(value);
-        int minutes = totalSeconds / 60;
-        int seconds = totalSeconds % 60;
-        juce::String timeString = std::to_string(minutes) + " : " + std::to_string(seconds);
-        currentTimeLabel.setText(timeString, juce::dontSendNotification);
-        value = playerAudio.getLength();
-        totalSeconds = int(value);
-        minutes = totalSeconds / 60;
-        seconds = totalSeconds % 60;
-        timeString = std::to_string(minutes) + " : " + std::to_string(seconds);
-
-        totalTimeLabel.setText(timeString, juce::dontSendNotification);
+        double currentPosition = playerAudio.getPosition();
+        positionSlider.setValue(currentPosition, juce::dontSendNotification);
+        int currentMinutes = (int)currentPosition / 60;
+        int currentSeconds = (int)currentPosition % 60;
+        currentTimeLabel.setText(
+            juce::String::formatted("%02d:%02d", currentMinutes, currentSeconds),
+            juce::dontSendNotification
+        );
     }
+    else
+    {
+        currentTimeLabel.setText("00:00", juce::dontSendNotification);
+        positionSlider.setValue(0.0, juce::dontSendNotification);
+    }
+    repaint();
 }
 void PlayerGUI::positionSliderSetVBounds()
 {

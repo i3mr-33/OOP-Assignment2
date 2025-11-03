@@ -45,10 +45,10 @@ bool PlayerAudio::loadFile(const juce::File& file)
             transportSource.stop();
             transportSource.setSource(nullptr);
             readerSource.reset();
-
+            // Audio Waveform
+            thumbnail.setSource(new juce::FileInputSource(file));
             // Create new reader source
             readerSource = std::make_unique<juce::AudioFormatReaderSource>(reader, true);
-
             // Attach safely
             transportSource.setSource(readerSource.get(),
                 0,
@@ -214,4 +214,3 @@ bool PlayerAudio::isABLooping() const
 {
     return isABLoopingvar;
 }
-
