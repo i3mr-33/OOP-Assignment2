@@ -26,7 +26,8 @@ public:
     int getNumRows() override;
     void paintListBoxItem(int rowNumber, juce::Graphics& g,
         int width, int height, bool rowIsSelected) override;
-    void updateMetaDataLabel(const juce::File& file);
+    void updateMetaDataLabelWithTagLib(const juce::File& file);
+    std::function<void(const juce::File&)> onFileChanged;
 
 private:
     PlayerAudio playerAudio;

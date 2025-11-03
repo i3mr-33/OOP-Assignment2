@@ -1,9 +1,12 @@
 ﻿#include "PlayerGUI.h"
 #include <JuceHeader.h>
+#include <taglib/fileref.h>
+#include <taglib/tag.h>
 PlayerGUI::PlayerGUI()
 {
     // Add buttons
-    for (auto* btn : { &loadButton, &loopButton, &playButton, &goToStartButton, &goToEndButton, &muteButton ,&nextButton, &prevButton , &forwardButton , &backwardButton , &setAButton, &setBButton, &abLoopButton })
+    for (auto* btn : { &loadButton, &loopButton, &playButton, &goToStartButton, &goToEndButton, &muteButton 
+        ,&nextButton, &prevButton , &forwardButton , &backwardButton , &setAButton, &setBButton, &abLoopButton })
     {
         btn->addListener(this);
         addAndMakeVisible(btn);
@@ -41,7 +44,7 @@ PlayerGUI::PlayerGUI()
     metaDataLabel.setFont(juce::Font(16.0f));
     metaDataLabel.setText("No file loaded.", juce::dontSendNotification);
     addAndMakeVisible(metaDataLabel);
-    playerAudio.onFileChanged = [this](const juce::File& file) { updateMetaDataLabel(file); };
+    playerAudio.onFileChanged = [this](const juce::File& file) { updateMetaDataLabelWithTagLib(file); };
 
 }
 PlayerGUI::~PlayerGUI()
@@ -117,7 +120,7 @@ void PlayerGUI::resized()
     volumeSlider.setBounds(20, getHeight() / 2 + 200, getWidth() - 40, 30);
     currentTimeLabel.setBounds(10, getHeight() / 2 + 100, 60, 30);
     totalTimeLabel.setBounds(getWidth() - 70, getHeight() / 2 + 100, 60, 30);
-    metaDataLabel.setBounds(15, 80, 250, 80);
+    metaDataLabel.setBounds(20, 120, getWidth() - 40, 60);
     prevButton.setBounds(getWidth() - 160, 60, 60, 40);
     nextButton.setBounds(getWidth() - 80, 60, 60, 40);
     playlistBox.setBounds(getWidth() - 160, 120, 140, 100);
@@ -125,54 +128,50 @@ void PlayerGUI::resized()
     setAButton.setBounds(15, y, 80, 40);
     setBButton.setBounds(115, y, 80, 40);
     abLoopButton.setBounds(215, y, 80, 40);
-    speedSlider.setBounds(20, 80, getWidth() - 40, 30);
+    speedSlider.setBounds(20, getHeight() / 2 + 150, getWidth() - 40, 30);
 }
 
 
-
-
-void PlayerGUI::updateMetaDataLabel(const juce::File& file)
+void PlayerGUI::updateMetaDataLabelWithTagLib(const juce::File& file)
 {
-    juce::AudioFormatManager formatManager;
-    formatManager.registerBasicFormats();
-
-    std::unique_ptr<juce::AudioFormatReader> reader(formatManager.createReaderFor(file));
+    TagLib::FileRef f(file.getFullPathName().toStdString().c_str());
     juce::String infoText;
 
-    if (reader != nullptr)
+    if (!f.isNull() && f.tag())
     {
-        auto metadata = reader->metadataValues;
+        auto tag = f.tag();
 
-        if (metadata.size() == 0)
+       
+        juce::String title = juce::String(tag->title().toCString(true));
+        juce::String artist = juce::String(tag->artist().toCString(true));
+        juce::String album = juce::String(tag->album().toCString(true));
+
+        
+        if (title.isEmpty() && artist.isEmpty() && album.isEmpty())
         {
             infoText = file.getFileName();
         }
         else
         {
-            double durationSeconds = reader->lengthInSamples / reader->sampleRate;
-            int minutes = int(durationSeconds) / 60;
-            int seconds = int(durationSeconds) % 60;
-
-            juce::String minutesStr = (minutes < 10 ? "0" : "") + juce::String(minutes);
-            juce::String secondsStr = (seconds < 10 ? "0" : "") + juce::String(seconds);
-
-            juce::String title = metadata.getValue("title", "Unknown");
-            juce::String author = metadata.getValue("artist", "Unknown");
-            juce::String album = metadata.getValue("album", "Unknown");
-
-            infoText = "Title: " + title + "\n"
-                "Author: " + author + "\n"
-                "Album: " + album + "\n"
-                "Duration: " + juce::String(minutesStr) + " : " + juce::String(secondsStr);
+            
+            if (!title.isEmpty())  infoText += "Title: " + title + "\n";
+            if (!artist.isEmpty()) infoText += "Artist: " + artist + "\n";
+            if (!album.isEmpty())  infoText += "Album: " + album;
         }
     }
     else
     {
-        infoText = "Unable to read file metadata.";
+        
+        infoText = file.getFileName();
     }
 
     metaDataLabel.setText(infoText, juce::dontSendNotification);
 }
+
+
+
+
+
 
 void PlayerGUI::buttonClicked(juce::Button* button)
 {
@@ -193,7 +192,7 @@ void PlayerGUI::buttonClicked(juce::Button* button)
                     playerAudio.loadFile(file);
 
                     // Update metadata label
-                    updateMetaDataLabel(file);
+                    updateMetaDataLabelWithTagLib(file);
 
                     // Set position slider range
                     positionSlider.setRange(0, playerAudio.getLength(), 1);
