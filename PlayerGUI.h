@@ -62,7 +62,7 @@ private:
 
     juce::Slider speedSlider;
     std::unique_ptr<juce::FileChooser> fileChooser;
-
+    juce::Colour offcolour;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PlayerGUI)
 };
 // test text

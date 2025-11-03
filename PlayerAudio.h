@@ -35,17 +35,25 @@ public:
     juce::File getCurrentFile() const;
     std::function<void(const juce::File&)> onFileChanged;
 
-    void setLoopA();
-	void setLoopB();
+    void setLoopA(double var = 0);
+	void setLoopB(double var = 0);
+    double getLoopA();
+	double getLoopB();
 	void toggleABLooping();
 	bool isABLooping() const;
     void setPlaybackSpeed(double ratio);
     double getCurrentSpeed() const;
+    void toggleA();
+	void toggleB();
+	bool isAOn() const;
+	bool isBOn() const;
 
     
 private:
-	double loopStart = 0.0;
-	double loopEnd = 0.0;
+	double loopStart = -1.0;
+	bool AisOn = false;
+	bool BisOn = false;
+	double loopEnd = -1.0;
 	bool isABLoopingvar = false;
     bool looping = false;
     bool running = true;
