@@ -62,7 +62,6 @@ PlayerGUI::~PlayerGUI()
 void PlayerGUI::prepareToPlay(int samplesPerBlockExpected, double sampleRate)
 {
     playerAudio.prepareToPlay(samplesPerBlockExpected, sampleRate);
-
 }
 void PlayerGUI::getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill)
 {
@@ -155,8 +154,9 @@ void PlayerGUI::resized()
     setAButton.setBounds(15, y, 80, 40);
     setBButton.setBounds(115, y, 80, 40);
     abLoopButton.setBounds(215, y, 80, 40);
-    speedSlider.setBounds(20, getHeight() / 2 + 150, getWidth() - 40, 30);
-
+    speedSlider.setBounds(20, 80, getWidth() - 40, 30);
+    
+	offcolour = abLoopButton.findColour(juce::TextButton::buttonOnColourId);
 }
 
 
@@ -169,32 +169,27 @@ void PlayerGUI::updateMetaDataLabelWithTagLib(const juce::File& file)
     {
         auto tag = f.tag();
 
-       
         juce::String title = juce::String(tag->title().toCString(true));
         juce::String artist = juce::String(tag->artist().toCString(true));
         juce::String album = juce::String(tag->album().toCString(true));
-
         
-        if (title.isEmpty() && artist.isEmpty() && album.isEmpty())
-        {
-            infoText = file.getFileName();
-        }
-        else
-        {
-            
-            if (!title.isEmpty())  infoText += "Title: " + title + "\n";
-            if (!artist.isEmpty()) infoText += "Artist: " + artist + "\n";
-            if (!album.isEmpty())  infoText += "Album: " + album;
-        }
+        if (title.isEmpty())
+            title = file.getFileNameWithoutExtension();
+ 
+        infoText = "Title: " + title;
+
+        if (!artist.isEmpty()) infoText += "\nArtist: " + artist;
+        if (!album.isEmpty())  infoText += "\nAlbum: " + album;
     }
     else
     {
-        
-        infoText = file.getFileName();
+        infoText = "Title: " + file.getFileNameWithoutExtension();
     }
 
     metaDataLabel.setText(infoText, juce::dontSendNotification);
+
 }
+
 
 
 
@@ -229,6 +224,13 @@ void PlayerGUI::buttonClicked(juce::Button* button)
 
                     // Set position slider range
                     positionSlider.setRange(0, playerAudio.getLength(), 1);
+                    // Update Total Time
+                    double totalLength = playerAudio.getLength();
+                    int totalMinutes = (int)totalLength / 60;
+                    int totalSecondsInt = (int)totalLength % 60;
+                    totalTimeLabel.setText(
+                        juce::String::formatted("%02d:%02d", totalMinutes, totalSecondsInt),
+                        juce::dontSendNotification);
                 }
             });
     }
@@ -302,40 +304,87 @@ void PlayerGUI::buttonClicked(juce::Button* button)
     }
     else if (button == &forwardButton)
     {
-        double newPosition = playerAudio.getPosition() + 10.0; 
+        double newPosition = playerAudio.getPosition() + 10.0;
         if (newPosition > playerAudio.getLength())
-            newPosition = playerAudio.getLength(); 
-        playerAudio.setPosition(newPosition); 
+            newPosition = playerAudio.getLength();
+        playerAudio.setPosition(newPosition);
     }
     else if (button == &backwardButton)
     {
-        double newPosition = playerAudio.getPosition() - 10.0; 
+        double newPosition = playerAudio.getPosition() - 10.0;
         if (newPosition < 0.0)
-            newPosition = 0.0; 
+            newPosition = 0.0;
         playerAudio.setPosition(newPosition);
     }
     else if (button == &setAButton)
     {
+
         playerAudio.setLoopA();
+        playerAudio.toggleA();
+        if (playerAudio.getLoopB() != -1.0 && playerAudio.getLoopB() <= playerAudio.getLoopA())
+        {
+            playerAudio.setLoopB(-1.0);
+            setBButton.setButtonText("Set B");
+        }
     }
-    else if (button == &setBButton)
-    {
-        playerAudio.setLoopB();
-    }
-    else if (button == &abLoopButton)
-    {
-        playerAudio.toggleABLooping();
-        if (playerAudio.isABLooping())
-            abLoopButton.setColour(juce::TextButton::buttonColourId, juce::Colours::darkred);
-        else
-            abLoopButton.setColour(juce::TextButton::buttonColourId, juce::Colours::darkcyan);
-    }
+        else if (button == &setBButton)
+        {
+
+            double current = playerAudio.getPosition();
+
+            if (playerAudio.getLoopA() == -1.0)
+            {
+                juce::AlertWindow::showMessageBoxAsync(juce::AlertWindow::WarningIcon,
+                    "Invalid Operation", "Please set point A before setting point B.");
+                return;
+            }
+
+            if (current <= playerAudio.getLoopA())
+            {
+                juce::AlertWindow::showMessageBoxAsync(juce::AlertWindow::WarningIcon,
+                    "Invalid Range", "Point B must be after point A.");
+                return;
+            }
+                playerAudio.toggleB();
+                playerAudio.setLoopB();
+        }
+        else if (button == &abLoopButton)
+        {
+            playerAudio.toggleABLooping();
+            if (playerAudio.isABLooping())
+                abLoopButton.setColour(juce::TextButton::buttonColourId, juce::Colours::cornflowerblue);
+            else
+                abLoopButton.setColour(juce::TextButton::buttonColourId, offcolour);
+        }
+    
 }
 
 void PlayerGUI::paint(juce::Graphics& g)
 {
     g.fillAll(juce::Colours::darkgrey);
+    juce::Rectangle<int> waveformBounds(65, getHeight() / 2 + 80, getWidth() - 130, 80);
+    if (playerAudio.getThumbnail().isFullyLoaded())
+    {
+        g.setColour(juce::Colours::cyan);
+        playerAudio.getThumbnail().drawChannel(
+            g,
+            waveformBounds.reduced(2),
+            0.0,
+            playerAudio.getLength(),
+            0,
+            1.0f
+        );
+    }
+    double totalLength = playerAudio.getLength();
+    if (totalLength > 0.0)
+    {
+        float progress = (float)(playerAudio.getPosition() / totalLength);
+        int xPosition = waveformBounds.getX() + (int)(waveformBounds.getWidth() * progress);
+        g.setColour(juce::Colours::red);
+        g.drawLine(xPosition, waveformBounds.getY(), xPosition, waveformBounds.getBottom(), 2.0f); // سمك 2 بكسل
+    }
 }
+
 
 void PlayerGUI::sliderValueChanged(juce::Slider* slider)
 {
@@ -362,14 +411,52 @@ void PlayerGUI::sliderValueChanged(juce::Slider* slider)
 }
 void PlayerGUI::timerCallback()
 {
-    if (playerAudio.isRunning())
+    double totalLength = playerAudio.getLength();
+    if (totalLength > 0.0)
     {
+        double currentPosition = playerAudio.getPosition();
+        positionSlider.setValue(currentPosition, juce::dontSendNotification);
+        int currentMinutes = (int)currentPosition / 60;
+        int currentSeconds = (int)currentPosition % 60;
+        currentTimeLabel.setText(
+            juce::String::formatted("%02d:%02d", currentMinutes, currentSeconds),
+            juce::dontSendNotification
+        );
+    }
+    else
+    {
+        currentTimeLabel.setText("00:00", juce::dontSendNotification);
+        positionSlider.setValue(0.0, juce::dontSendNotification);
+    }
+    repaint();
         positionSlider.setValue(playerAudio.getPosition(), juce::dontSendNotification);
         double value = positionSlider.getValue();
         int totalSeconds = int(value);
         int minutes = totalSeconds / 60;
         int seconds = totalSeconds % 60;
         juce::String timeString = std::to_string(minutes) + " : " + std::to_string(seconds);
+        if (playerAudio.isAOn())
+        {
+            if(playerAudio.getLoopB() <= playerAudio.getLoopA() && playerAudio.getLoopB() != -1.0)
+            {
+			}
+            else
+            {
+                playerAudio.toggleA();
+                setAButton.setButtonText("A \n" + timeString);
+            }
+        }
+        if (playerAudio.isBOn())
+        {
+            if (playerAudio.getLoopB() <= playerAudio.getLoopA() && playerAudio.getLoopB() != -1.0)
+            {
+            }
+            else
+            { 
+            playerAudio.toggleB();
+            setBButton.setButtonText("B \n" + timeString);
+            }
+            }
         currentTimeLabel.setText(timeString, juce::dontSendNotification);
         value = playerAudio.getLength();
         totalSeconds = int(value);
@@ -378,7 +465,15 @@ void PlayerGUI::timerCallback()
         timeString = std::to_string(minutes) + " : " + std::to_string(seconds);
 
         totalTimeLabel.setText(timeString, juce::dontSendNotification);
-    }
+    
+    if(playerAudio.isABLooping())
+        {
+        double currentPosition = playerAudio.getPosition();
+        if (currentPosition >= playerAudio.getLength() || currentPosition >= playerAudio.getLoopB())
+        {
+            playerAudio.setPosition(playerAudio.getLoopA());
+        }
+	}
 }
 void PlayerGUI::positionSliderSetVBounds()
 {

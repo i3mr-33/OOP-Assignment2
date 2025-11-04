@@ -45,10 +45,10 @@ bool PlayerAudio::loadFile(const juce::File& file)
             transportSource.stop();
             transportSource.setSource(nullptr);
             readerSource.reset();
-
+            // Audio Waveform
+            thumbnail.setSource(new juce::FileInputSource(file));
             // Create new reader source
             readerSource = std::make_unique<juce::AudioFormatReaderSource>(reader, true);
-
             // Attach safely
             transportSource.setSource(readerSource.get(),
                 0,
@@ -194,17 +194,20 @@ juce::File PlayerAudio::getCurrentFile() const
 
 
 
-void PlayerAudio::setLoopA()
+void PlayerAudio::setLoopA(double var )
 {
-    loopStart = getPosition();
+    if (var == 0)
+        loopStart = getPosition();
+    else
+        loopStart = var;
 }
-void PlayerAudio::setLoopB()
+void PlayerAudio::setLoopB(double var )
 {
-    loopEnd = getPosition();
-    if (loopEnd > loopStart)
-    {
-        isABLoopingvar = true;
-    }
+	if (var == 0)
+        loopEnd = getPosition();
+    else
+		loopEnd = var;
+    
 }
 void PlayerAudio::toggleABLooping()
 {
@@ -214,4 +217,27 @@ bool PlayerAudio::isABLooping() const
 {
     return isABLoopingvar;
 }
-
+double PlayerAudio::getLoopA()
+{
+    return loopStart;
+}
+double PlayerAudio::getLoopB()
+{
+    return loopEnd;
+}
+void PlayerAudio::toggleA()
+{
+    AisOn = !AisOn;
+}
+bool PlayerAudio::isAOn() const
+{
+    return AisOn;
+}
+void PlayerAudio::toggleB()
+{
+    BisOn = !BisOn;
+}
+bool PlayerAudio::isBOn() const
+{
+	return BisOn;
+}

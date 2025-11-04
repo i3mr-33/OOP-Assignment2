@@ -67,6 +67,7 @@ private:
 
     int currentlyPlayingRow = -1;
 
+    juce::Colour offcolour;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PlayerGUI)
 };
 // test text
