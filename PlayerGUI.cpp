@@ -112,10 +112,10 @@ void PlayerGUI::resized()
     goToEndButton.setBounds(x + 125, y, 70, 40);     
     forwardButton.setBounds(x + 45, y, 70, 40);    
 
-    positionSlider.setBounds(65, getHeight() / 2 + 100, getWidth() - 130, 100);
+    positionSlider.setBounds(65, getHeight() / 2 + 170, getWidth() - 130, 30);
     volumeSlider.setBounds(20, getHeight() / 2 + 210, getWidth() - 40, 30);
-    currentTimeLabel.setBounds(10, getHeight() / 2 + 100, 60, 100);
-    totalTimeLabel.setBounds(getWidth() - 70, getHeight() / 2 + 100, 60, 100);
+    currentTimeLabel.setBounds(10, getHeight() / 2 + 170, 60, 30);
+    totalTimeLabel.setBounds(getWidth() - 70, getHeight() / 2 + 170, 60, 30);
     metaDataLabel.setBounds(15, 80, 250, 80);
     prevButton.setBounds(getWidth() - 160, 60, 60, 40);
     nextButton.setBounds(getWidth() - 80, 60, 60, 40);
@@ -320,7 +320,7 @@ void PlayerGUI::buttonClicked(juce::Button* button)
 void PlayerGUI::paint(juce::Graphics& g)
 {
     g.fillAll(juce::Colours::darkgrey);
-    auto waveformBounds = positionSlider.getBounds();
+    juce::Rectangle<int> waveformBounds(65, getHeight() / 2 + 80, getWidth() - 130, 80);
     if (playerAudio.getThumbnail().isFullyLoaded())
     {
         g.setColour(juce::Colours::cyan);
