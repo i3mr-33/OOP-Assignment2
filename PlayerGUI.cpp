@@ -11,8 +11,17 @@ PlayerGUI::PlayerGUI()
         btn->addListener(this);
         addAndMakeVisible(btn);
     }
+
     playlistBox.setModel(this);
-    addAndMakeVisible(playlistBox);
+    playlistBox.setColour(juce::ListBox::backgroundColourId, juce::Colours::darkgrey);
+
+    playlistTitleLabel.setJustificationType(juce::Justification::centredLeft);
+    playlistTitleLabel.setText("Playlist:", juce::dontSendNotification);
+    playlistTitleLabel.setColour(juce::Label::textColourId, juce::Colours::white);
+    playlistTitleLabel.setFont(juce::Font(18.0f, juce::Font::plain));
+
+    addAndMakeVisible(playlistBox); 
+    addAndMakeVisible(playlistTitleLabel);
 
     // Volume slider
     volumeSlider.setRange(0.0, 1.0, 0.01);
@@ -66,21 +75,38 @@ void PlayerGUI::releaseResources()
 }
 int PlayerGUI::getNumRows()
 {
+    if (playlistItems.isEmpty())
+        return 1; 
+    else 
     return playlistItems.size();
 }
 
 void PlayerGUI::paintListBoxItem(int rowNumber, juce::Graphics& g,
     int width, int height, bool rowIsSelected)
 {
-    if (rowIsSelected)
-        g.fillAll(juce::Colours::lightblue);
+  
+    if (playlistItems.isEmpty())
+    {
+        g.setColour(juce::Colours::lightgrey);
+        g.setFont(juce::Font(16.0f, juce::Font::italic));
+        g.drawText("No songs loaded", 0, 0, width, height,
+            juce::Justification::centred);
+        return;
+    }
 
+   
+    if (rowNumber == currentlyPlayingRow)
+        g.setColour(juce::Colours::aqua);   
+    else
+        g.setColour(juce::Colours::white);  
+
+   
     if (rowNumber < playlistItems.size())
     {
-        g.setColour(juce::Colours::black);
-        g.drawText(playlistItems[rowNumber], 2, 0, width - 4, height,
+        juce::String text = juce::String(rowNumber + 1) + ") " + playlistItems[rowNumber];
+        g.setFont(juce::Font(16.0f, juce::Font::plain));
+        g.drawText(text, 8, 0, width - 10, height,
             juce::Justification::centredLeft);
-        
     }
 }
 //void PlayerGUI::resized()
@@ -123,12 +149,14 @@ void PlayerGUI::resized()
     metaDataLabel.setBounds(20, 120, getWidth() - 40, 60);
     prevButton.setBounds(getWidth() - 160, 60, 60, 40);
     nextButton.setBounds(getWidth() - 80, 60, 60, 40);
-    playlistBox.setBounds(getWidth() - 160, 120, 140, 100);
+    playlistBox.setBounds(getWidth() - 160, 130, 140, 100);
+    playlistTitleLabel.setBounds(getWidth() - 160, 100, 200, 40); 
 
     setAButton.setBounds(15, y, 80, 40);
     setBButton.setBounds(115, y, 80, 40);
     abLoopButton.setBounds(215, y, 80, 40);
     speedSlider.setBounds(20, getHeight() / 2 + 150, getWidth() - 40, 30);
+
 }
 
 
@@ -188,8 +216,13 @@ void PlayerGUI::buttonClicked(juce::Button* button)
                     // Add to playlist & load
                     playlistItems.add(file.getFileName());
                     playlistBox.updateContent();
+                    playlistBox.repaint();
                     playerAudio.addToPlaylist({ file });
                     playerAudio.loadFile(file);
+                    currentlyPlayingRow = playlistItems.indexOf(file.getFileName());
+
+                    playlistBox.updateContent();
+                    playlistBox.repaint();
 
                     // Update metadata label
                     updateMetaDataLabelWithTagLib(file);
@@ -246,10 +279,26 @@ void PlayerGUI::buttonClicked(juce::Button* button)
     else if (button == &nextButton)
     {
         playerAudio.playNext();
+
+        
+        auto currentFile = playerAudio.getCurrentFile();
+        currentlyPlayingRow = playlistItems.indexOf(currentFile.getFileName());
+
+       
+        playlistBox.updateContent();
+        playlistBox.repaint();
     }
     else if (button == &prevButton)
     {
         playerAudio.playPrevious();
+
+       
+        auto currentFile = playerAudio.getCurrentFile();
+        currentlyPlayingRow = playlistItems.indexOf(currentFile.getFileName());
+
+        
+        playlistBox.updateContent();
+        playlistBox.repaint();
     }
     else if (button == &forwardButton)
     {

@@ -50,6 +50,7 @@ private:
     juce::TextButton nextButton{ juce:: CharPointer_UTF8(u8"▶️") };
     juce::TextButton prevButton{juce:: CharPointer_UTF8(u8"◀️" )};
     juce::ListBox playlistBox;  
+    juce::Label playlistTitleLabel;
     juce::StringArray playlistItems; 
     juce::TextButton forwardButton{ juce::CharPointer_UTF8(u8"⏩") }; 
     juce::TextButton backwardButton{ juce::CharPointer_UTF8(u8"⏪") };
@@ -63,6 +64,8 @@ private:
 
     juce::Slider speedSlider;
     std::unique_ptr<juce::FileChooser> fileChooser;
+
+    int currentlyPlayingRow = -1;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PlayerGUI)
 };
