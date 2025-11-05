@@ -7,7 +7,8 @@ PlayerGUI::PlayerGUI()
 	setLookAndFeel(&customLookAndFeel);
     // Add buttons
     for (auto* btn : { &loadButton, &loopButton, &playButton, &goToStartButton, &goToEndButton, &muteButton 
-        ,&nextButton, &prevButton , &forwardButton , &backwardButton , &setAButton, &setBButton, &abLoopButton })
+        ,&nextButton, &prevButton , &forwardButton , &backwardButton , &setAButton, 
+        &setBButton, &abLoopButton,&markerButton , & gotoMarkerButton })
     {
         btn->addListener(this);
         addAndMakeVisible(btn);
@@ -144,6 +145,10 @@ void PlayerGUI::resized()
     speedSlider.setBounds(getWidth() - 350, y + 170, 350, 30);
     
 	offcolour = abLoopButton.findColour(juce::TextButton::buttonOnColourId);
+    markerButton.setBounds(130, 15, 90, 50);
+    gotoMarkerButton.setBounds(240, 15 , 90, 50);
+
+
 }
 
 
@@ -314,7 +319,7 @@ void PlayerGUI::buttonClicked(juce::Button* button)
             setBButton.setButtonText("Set B");
         }
     }
-        else if (button == &setBButton)
+    else if (button == &setBButton)
         {
 
             double current = playerAudio.getPosition();
@@ -335,11 +340,43 @@ void PlayerGUI::buttonClicked(juce::Button* button)
                 playerAudio.toggleB();
                 playerAudio.setLoopB();
         }
-        else if (button == &abLoopButton)
-        {
+    else if (button == &abLoopButton)
+     {
             playerAudio.toggleABLooping();
 			abLoopButton.setToggleState(playerAudio.isABLooping(), juce::dontSendNotification);
+     }
+    else if (button == &markerButton)
+    {
+        double currentPos = playerAudio.getPosition();
+
+        if (playerAudio.getMarker() >= 0)
+        {
+            playerAudio.clearMarker();
+            markerButton.setButtonText("Marker");
         }
+        else
+        {
+            playerAudio.setMarker(currentPos);
+
+            
+            int totalSeconds = int(currentPos);
+            int minutes = totalSeconds / 60;
+            int seconds = totalSeconds % 60;
+
+            juce::String timeString = std::to_string(minutes) + ":" + (seconds < 10 ? "0" : "") + std::to_string(seconds);
+
+            markerButton.setButtonText("Marker: " + timeString);
+        }
+        }
+
+    else if (button == &gotoMarkerButton)
+    {
+        if (playerAudio.getMarker() >= 0)
+            playerAudio.setPosition(playerAudio.getMarker());
+     }
+
+
+
     
 }
 
@@ -369,8 +406,18 @@ void PlayerGUI::paint(juce::Graphics& g)
         float progress = (float)(playerAudio.getPosition() / totalLength);
         int xPosition = waveformBounds.getX() + (int)(waveformBounds.getWidth() * progress);
         g.setColour(juce::Colours::red);
-        g.drawLine(xPosition, waveformBounds.getY(), xPosition, waveformBounds.getBottom(), 2.0f); // سمك 2 بكسل
+        g.drawLine(xPosition, waveformBounds.getY(), xPosition, waveformBounds.getBottom(), 2.0f); 
     }
+    double marker = playerAudio.getMarker();
+    if (marker >= 0.0)
+    {
+        juce::Rectangle<int> waveformBounds(20, getHeight() / 2 - 100, 800, 120); 
+        float xPos = waveformBounds.getX() +
+            (float)(marker / playerAudio.getLength() * waveformBounds.getWidth());
+        g.setColour(juce::Colours::yellow);
+        g.drawLine(xPos, waveformBounds.getY(), xPos, waveformBounds.getBottom(), 2.0f);
+    }
+
 }
 
 

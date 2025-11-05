@@ -42,9 +42,7 @@ public:
 	void toggleABLooping();
 	bool isABLooping() const;
     void setPlaybackSpeed(double ratio);
-    double getCurrentSpeed() const;
-    double getCurrentPositionSeconds() const;
-    double getTotalLengthSeconds() const;
+    double getCurrentSpeed() const; 
     juce::AudioThumbnail& getThumbnail() { return thumbnail; }
     void toggleA();
 	void toggleB();
@@ -53,6 +51,10 @@ public:
     juce::String getLastLoadedFilePath() const; 
     void setPlaybackPositionInSeconds(double pos);
     double getPlaybackPositionInSeconds() const;
+    void PlayerAudio::setMarker(double pos);
+    double PlayerAudio::getMarker() const;
+    void PlayerAudio::clearMarker();
+
     
 private:
 	double loopStart = -1.0;
@@ -70,6 +72,8 @@ private:
 
     juce::Array<juce::File> playlist;  
     int currentIndex = -1; 
+    double markerPosition = -1.0; 
+
   
 
 

@@ -123,7 +123,7 @@ void MainComponent::resized()
     masterSliderBounds.reduce(10, 0);
     masterVolumeSlider.setBounds(masterSliderBounds);
 
-	auto player1Bounds = bounds.removeFromTop(bounds.getWidth() / 2);
+	auto player1Bounds = bounds.removeFromLeft(bounds.getWidth() / 2);
 	player1.setBounds(player1Bounds);
 	player2.setBounds(bounds);
 }
