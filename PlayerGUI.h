@@ -1,7 +1,7 @@
 ﻿#pragma once						// PlayerGUI.h
 #include <JuceHeader.h>
 #include "PlayerAudio.h"
-
+#include "CustomLookAndFeel.h"
 class PlayerGUI : public juce::Component,
     public juce::Button::Listener,
     public juce::Slider::Listener,
@@ -31,6 +31,7 @@ public:
 
 private:
     PlayerAudio playerAudio;
+	CustomLookAndFeel customLookAndFeel;
 
     // GUI elements
     juce::TextButton loadButton{ "Load File" };
