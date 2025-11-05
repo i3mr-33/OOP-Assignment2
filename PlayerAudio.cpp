@@ -241,3 +241,16 @@ bool PlayerAudio::isBOn() const
 {
 	return BisOn;
 }
+void PlayerAudio::setMarker(double pos) 
+{ 
+    markerPosition = pos;
+}
+double PlayerAudio::getMarker() const 
+{ 
+    return markerPosition;
+}
+void PlayerAudio::clearMarker() 
+{ 
+    markerPosition = -1.0; 
+}
+

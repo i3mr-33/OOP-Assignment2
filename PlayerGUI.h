@@ -61,6 +61,10 @@ private:
 	juce::TextButton setAButton{ "Set A" };
 	juce::TextButton setBButton{ "Set B" };
 	juce::TextButton abLoopButton{ "A-B Loop" };
+    juce::TextButton markerButton{ "Marker" };
+    juce::TextButton gotoMarkerButton{ "Go to Marker" };
+
+
 
 
     juce::Slider speedSlider;
