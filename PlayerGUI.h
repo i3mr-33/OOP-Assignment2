@@ -28,6 +28,7 @@ public:
         int width, int height, bool rowIsSelected) override;
     void updateMetaDataLabelWithTagLib(const juce::File& file);
     std::function<void(const juce::File&)> onFileChanged;
+    PlayerAudio& getPlayerAudio() { return playerAudio; }
 
 private:
     PlayerAudio playerAudio;

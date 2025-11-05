@@ -49,6 +49,8 @@ bool PlayerAudio::loadFile(const juce::File& file)
             thumbnail.setSource(new juce::FileInputSource(file));
             // Create new reader source
             readerSource = std::make_unique<juce::AudioFormatReaderSource>(reader, true);
+            // add update to last file
+            lastLoadedFile = file;
             // Attach safely
             transportSource.setSource(readerSource.get(),
                 0,
@@ -240,4 +242,19 @@ void PlayerAudio::toggleB()
 bool PlayerAudio::isBOn() const
 {
 	return BisOn;
+}
+
+juce::String PlayerAudio::getLastLoadedFilePath() const
+{
+    return lastLoadedFile.getFullPathName();
+}
+
+void PlayerAudio::setPlaybackPositionInSeconds(double pos)
+{
+    transportSource.setPosition(pos);
+}
+
+double PlayerAudio::getPlaybackPositionInSeconds() const
+{
+    return transportSource.getCurrentPosition();
 }

@@ -50,7 +50,9 @@ public:
 	void toggleB();
 	bool isAOn() const;
 	bool isBOn() const;
-
+    juce::String getLastLoadedFilePath() const; 
+    void setPlaybackPositionInSeconds(double pos);
+    double getPlaybackPositionInSeconds() const;
     
 private:
 	double loopStart = -1.0;
@@ -75,5 +77,6 @@ private:
 
     juce::AudioThumbnailCache thumbnailCache{ 5 };
     juce::AudioThumbnail thumbnail{ 512, formatManager, thumbnailCache };
+    juce::File lastLoadedFile;
     // JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PlayerAudio)
 };

@@ -25,5 +25,6 @@ private:
 	float lastmasterVolume = 1.0f;
     juce::Slider masterVolumeSlider;
     juce::Label masterVolumeLabel;
+    juce::File getSessionSaveFile();
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
 };
