@@ -18,12 +18,44 @@ MainComponent::MainComponent()
 
     lastmasterVolume = (float)masterVolumeSlider.getValue();
     masterVolume = lastmasterVolume;
-    
+    auto saveFile = getSessionSaveFile();
+    auto savedData = saveFile.loadFileAsString();
+    auto lines = juce::StringArray::fromLines(savedData);
+    if (lines.size() >= 4)
+    {
+        // Player 1 Loading
+        juce::File file1(lines[0]);
+        double pos1 = lines[1].getDoubleValue();
+        if (file1.existsAsFile())
+        {
+            player1.getPlayerAudio().loadFile(file1);
+            player1.getPlayerAudio().setPlaybackPositionInSeconds(pos1);
+        }
+        // Player 2 Loading
+        juce::File file2(lines[2]);
+        double pos2 = lines[3].getDoubleValue();
+        if (file2.existsAsFile())
+        {
+            player2.getPlayerAudio().loadFile(file2);
+            player2.getPlayerAudio().setPlaybackPositionInSeconds(pos2);
+        }
+    }
+
     setSize(1000, 2000);
     setAudioChannels(0, 2);
 }
 MainComponent::~MainComponent()
 {
+    juce::String stateToSave;
+    // collect data player 1
+    stateToSave << player1.getPlayerAudio().getLastLoadedFilePath() << "\n";
+    stateToSave << player1.getPlayerAudio().getPlaybackPositionInSeconds() << "\n";
+    // collect data player 2
+    stateToSave << player2.getPlayerAudio().getLastLoadedFilePath() << "\n";
+    stateToSave << player2.getPlayerAudio().getPlaybackPositionInSeconds() << "\n";
+    // save in file 
+    auto saveFile = getSessionSaveFile();
+    saveFile.replaceWithText(stateToSave);
     shutdownAudio();
 }
 void MainComponent::paint(juce::Graphics& g)
@@ -102,5 +134,11 @@ void MainComponent::sliderValueChanged(juce::Slider* slider)
         masterVolume = (float)masterVolumeSlider.getValue();
     }
 }
-
+juce::File MainComponent::getSessionSaveFile()
+{
+    auto appDataDir = juce::File::getSpecialLocation(juce::File::userApplicationDataDirectory);
+    auto appSpecificDir = appDataDir.getChildFile("MyJuceDJMixer");
+    appSpecificDir.createDirectory();
+    return appSpecificDir.getChildFile("last_session_state.txt");
+}
 

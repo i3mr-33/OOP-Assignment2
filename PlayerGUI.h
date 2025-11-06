@@ -40,6 +40,7 @@ public:
 
     void updateMetaDataLabelWithTagLib(const juce::File& file);
     std::function<void(const juce::File&)> onFileChanged;
+    PlayerAudio& getPlayerAudio() { return playerAudio; }
 
     void updateMarkerList();
 
