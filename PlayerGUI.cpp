@@ -2,19 +2,55 @@
 #include <JuceHeader.h>
 #include <taglib/fileref.h>
 #include <taglib/tag.h>
+
+
+class MarkerListModel : public juce::ListBoxModel
+{
+public:
+    MarkerListModel(juce::StringArray& names, PlayerAudio& audio, PlayerGUI& gui)
+        : markerNames(names), playerAudio(audio), playerGUI(gui) {
+    }
+
+    int getNumRows() override { return playerGUI.getNumMarkerRows(); }
+
+    void paintListBoxItem(int rowNumber, juce::Graphics& g,
+        int width, int height, bool rowIsSelected) override
+    {
+        playerGUI.paintMarkerListBoxItem(rowNumber, g, width, height, rowIsSelected);
+    }
+
+private:
+    juce::StringArray& markerNames;
+    PlayerAudio& playerAudio;
+    PlayerGUI& playerGUI;
+};
+
+
 PlayerGUI::PlayerGUI()
 {
-	setLookAndFeel(&customLookAndFeel);
-    // Add buttons
-    for (auto* btn : { &loadButton, &loopButton, &playButton, &goToStartButton, &goToEndButton, &muteButton 
-        ,&nextButton, &prevButton , &forwardButton , &backwardButton , &setAButton, 
-        &setBButton, &abLoopButton,&markerButton , & gotoMarkerButton })
+    setLookAndFeel(&customLookAndFeel);
+    
+    juce::TextButton* buttons[] =
+    {
+        &loadButton, &loopButton, &playButton, &goToStartButton, &goToEndButton, &muteButton,
+        &nextButton, &prevButton , &forwardButton , &backwardButton , &setAButton,
+        &setBButton, &abLoopButton,&markerButton , &gotoMarkerButton
+    };
+
+    
+    for (auto* btn : buttons)
     {
         btn->addListener(this);
         addAndMakeVisible(btn);
     }
 
-    playlistBox.setModel(this);
+   
+    
+    markerModel = std::make_unique<MarkerListModel>(markerNames, playerAudio, *this);
+    markerListBox.setModel(markerModel.get());
+    addAndMakeVisible(markerListBox);
+
+    playlistBox.setModel(this); 
     playlistBox.setColour(juce::ListBox::backgroundColourId, juce::Colours::darkgrey);
 
     playlistTitleLabel.setJustificationType(juce::Justification::centredLeft);
@@ -22,10 +58,9 @@ PlayerGUI::PlayerGUI()
     playlistTitleLabel.setColour(juce::Label::textColourId, juce::Colours::white);
     playlistTitleLabel.setFont(juce::Font(18.0f, juce::Font::plain));
 
-    addAndMakeVisible(playlistBox); 
+    addAndMakeVisible(playlistBox);
     addAndMakeVisible(playlistTitleLabel);
 
-    // Volume slider
     volumeSlider.setRange(0.0, 1.0, 0.01);
     volumeSlider.setValue(0.5);
     volumeSlider.addListener(this);
@@ -60,7 +95,7 @@ PlayerGUI::PlayerGUI()
 }
 PlayerGUI::~PlayerGUI()
 {
-	setLookAndFeel(nullptr);
+    setLookAndFeel(nullptr);
 }
 void PlayerGUI::prepareToPlay(int samplesPerBlockExpected, double sampleRate)
 {
@@ -75,18 +110,23 @@ void PlayerGUI::releaseResources()
 {
     playerAudio.releaseResources();
 }
+
 int PlayerGUI::getNumRows()
 {
     if (playlistItems.isEmpty())
-        return 1; 
+    {
+        return 1;
+    }
     else 
-    return playlistItems.size();
+    {
+        return playlistItems.size();
+    }
 }
 
 void PlayerGUI::paintListBoxItem(int rowNumber, juce::Graphics& g,
     int width, int height, bool rowIsSelected)
 {
-  
+
     if (playlistItems.isEmpty())
     {
         g.setColour(juce::Colours::lightgrey);
@@ -96,13 +136,13 @@ void PlayerGUI::paintListBoxItem(int rowNumber, juce::Graphics& g,
         return;
     }
 
-   
-    if (rowNumber == currentlyPlayingRow)
-        g.setColour(juce::Colours::aqua);   
-    else
-        g.setColour(juce::Colours::white);  
 
-   
+    if (rowNumber == currentlyPlayingRow)
+        g.setColour(juce::Colours::aqua);
+    else
+        g.setColour(juce::Colours::white);
+
+
     if (rowNumber < playlistItems.size())
     {
         juce::String text = juce::String(rowNumber + 1) + ") " + playlistItems[rowNumber];
@@ -111,6 +151,8 @@ void PlayerGUI::paintListBoxItem(int rowNumber, juce::Graphics& g,
             juce::Justification::centredLeft);
     }
 }
+
+
 void PlayerGUI::resized()
 {
     int y = getHeight() / 2;
@@ -120,10 +162,10 @@ void PlayerGUI::resized()
     loopButton.setBounds(getWidth() - 80, 15, 60, 40);
     muteButton.setBounds(getWidth() - 160, 15, 60, 40);
 
-   
-    backwardButton.setBounds(x - 90, y + 150, 70, 40);    
+
+    backwardButton.setBounds(x - 90, y + 150, 70, 40);
     goToStartButton.setBounds(x - 180, y + 150, 70, 40);
-    playButton.setBounds(x , y + 150, 70, 40);
+    playButton.setBounds(x, y + 150, 70, 40);
     goToEndButton.setBounds(x + 180, y + 150, 70, 40);
     forwardButton.setBounds(x + 90, y + 150, 70, 40);
 
@@ -139,14 +181,15 @@ void PlayerGUI::resized()
     currentTimeLabel.setBounds(10, getHeight() - 40, 60, 30);
     totalTimeLabel.setBounds(getWidth() - 70, getHeight() - 40, 60, 30);
     metaDataLabel.setBounds(15, 80, getWidth() - 40, 60);
-    
+
     positionSlider.setBounds(60, getHeight() - 40, getWidth() - 130, 30);
     volumeSlider.setBounds(getWidth() - 350, y + 130, 350, 30);
     speedSlider.setBounds(getWidth() - 350, y + 170, 350, 30);
-    
-	offcolour = abLoopButton.findColour(juce::TextButton::buttonOnColourId);
-    markerButton.setBounds(130, 15, 90, 50);
-    gotoMarkerButton.setBounds(240, 15 , 90, 50);
+
+    markerListBox.setBounds(150, 50, 150, 150);
+    markerButton.setBounds(110, 15, 90, 30);
+    gotoMarkerButton.setBounds(210, 15, 90, 30);
+
 
 
 }
@@ -155,7 +198,9 @@ void PlayerGUI::resized()
 void PlayerGUI::updateMetaDataLabelWithTagLib(const juce::File& file)
 {
     TagLib::FileRef f(file.getFullPathName().toStdString().c_str());
-    juce::String infoText;
+
+    
+    juce::String infoText = juce::String();
 
     if (!f.isNull() && f.tag())
     {
@@ -164,14 +209,15 @@ void PlayerGUI::updateMetaDataLabelWithTagLib(const juce::File& file)
         juce::String title = juce::String(tag->title().toCString(true));
         juce::String artist = juce::String(tag->artist().toCString(true));
         juce::String album = juce::String(tag->album().toCString(true));
-        
+
         if (title.isEmpty())
             title = file.getFileNameWithoutExtension();
- 
-        infoText = "Title: " + title;
 
+        infoText = "Title: " + title; 
+
+        
         if (!artist.isEmpty()) infoText += "\nArtist: " + artist;
-        if (!album.isEmpty())  infoText += "\nAlbum: " + album;
+        if (!album.isEmpty())  infoText += "\nAlbum: " + album ;
     }
     else
     {
@@ -179,13 +225,41 @@ void PlayerGUI::updateMetaDataLabelWithTagLib(const juce::File& file)
     }
 
     metaDataLabel.setText(infoText, juce::dontSendNotification);
+}
 
+
+int PlayerGUI::getNumMarkerRows()
+{
+    return markerNames.size();
+}
+
+void PlayerGUI::paintMarkerListBoxItem(int rowNumber, juce::Graphics& g,
+    int width, int height, bool rowIsSelected)
+{
+    g.setColour(rowIsSelected ? juce::Colours::aqua : juce::Colours::white);
+
+    if (rowNumber < markerNames.size())
+    {
+        
+        double markerPos = playerAudio.getMarker(rowNumber);
+        int minutes = (int)markerPos / 60;
+        int seconds = (int)markerPos % 60;
+        juce::String timeStr = juce::String::formatted("%02d:%02d", minutes, seconds);
+
+        juce::String text = markerNames[rowNumber] + " (" + timeStr + ")";
+
+        g.drawText(text, 4, 0, width - 4, height, juce::Justification::centredLeft, true);
+    }
 }
 
 
 
-
-
+void PlayerGUI::updateMarkerList()
+{
+    
+    markerListBox.updateContent();
+    markerListBox.repaint();
+}
 
 
 void PlayerGUI::buttonClicked(juce::Button* button)
@@ -206,17 +280,23 @@ void PlayerGUI::buttonClicked(juce::Button* button)
                     playlistBox.repaint();
                     playerAudio.addToPlaylist({ file });
                     playerAudio.loadFile(file);
-                    currentlyPlayingRow = playlistItems.indexOf(file.getFileName());
+                    currentlyPlayingRow = playerAudio.getCurrentIndex();
 
                     playlistBox.updateContent();
                     playlistBox.repaint();
 
-                    // Update metadata label
+                   
                     updateMetaDataLabelWithTagLib(file);
 
-                    // Set position slider range
+                   
+                    playerAudio.clearMarkers();
+                    markerNames.clear();
+                    updateMarkerList();
+                    markerButton.setButtonText("Marker");
+
+                    
                     positionSlider.setRange(0, playerAudio.getLength(), 1);
-                    // Update Total Time
+                  
                     double totalLength = playerAudio.getLength();
                     int totalMinutes = (int)totalLength / 60;
                     int totalSecondsInt = (int)totalLength % 60;
@@ -274,11 +354,16 @@ void PlayerGUI::buttonClicked(juce::Button* button)
     {
         playerAudio.playNext();
 
-        
-        auto currentFile = playerAudio.getCurrentFile();
-        currentlyPlayingRow = playlistItems.indexOf(currentFile.getFileName());
+        playerAudio.clearMarkers();
+        markerNames.clear();
+        updateMarkerList();
+        markerButton.setButtonText("Marker");
 
-       
+
+        auto currentFile = playerAudio.getCurrentFile();
+        currentlyPlayingRow = playerAudio.getCurrentIndex();
+
+
         playlistBox.updateContent();
         playlistBox.repaint();
     }
@@ -286,11 +371,15 @@ void PlayerGUI::buttonClicked(juce::Button* button)
     {
         playerAudio.playPrevious();
 
-       
-        auto currentFile = playerAudio.getCurrentFile();
-        currentlyPlayingRow = playlistItems.indexOf(currentFile.getFileName());
+        playerAudio.clearMarkers();
+        markerNames.clear();
+        updateMarkerList();
+        markerButton.setButtonText("Marker");
 
-        
+
+        currentlyPlayingRow = playerAudio.getCurrentIndex();
+
+
         playlistBox.updateContent();
         playlistBox.repaint();
     }
@@ -320,64 +409,54 @@ void PlayerGUI::buttonClicked(juce::Button* button)
         }
     }
     else if (button == &setBButton)
+    {
+
+        double current = playerAudio.getPosition();
+
+        if (playerAudio.getLoopA() == -1.0)
         {
-
-            double current = playerAudio.getPosition();
-
-            if (playerAudio.getLoopA() == -1.0)
-            {
-                juce::AlertWindow::showMessageBoxAsync(juce::AlertWindow::WarningIcon,
-                    "Invalid Operation", "Please set point A before setting point B.");
-                return;
-            }
-
-            if (current <= playerAudio.getLoopA())
-            {
-                juce::AlertWindow::showMessageBoxAsync(juce::AlertWindow::WarningIcon,
-                    "Invalid Range", "Point B must be after point A.");
-                return;
-            }
-                playerAudio.toggleB();
-                playerAudio.setLoopB();
+            juce::AlertWindow::showMessageBoxAsync(juce::AlertWindow::WarningIcon,
+                "Invalid Operation", "Please set point A before setting point B.");
+            return;
         }
+
+        if (current <= playerAudio.getLoopA())
+        {
+            juce::AlertWindow::showMessageBoxAsync(juce::AlertWindow::WarningIcon,
+                "Invalid Range", "Point B must be after point A.");
+            return;
+        }
+        playerAudio.toggleB();
+        playerAudio.setLoopB();
+    }
     else if (button == &abLoopButton)
-     {
-            playerAudio.toggleABLooping();
-			abLoopButton.setToggleState(playerAudio.isABLooping(), juce::dontSendNotification);
-     }
+    {
+        playerAudio.toggleABLooping();
+        abLoopButton.setToggleState(playerAudio.isABLooping(), juce::dontSendNotification);
+    }
     else if (button == &markerButton)
     {
         double currentPos = playerAudio.getPosition();
+        playerAudio.addMarker(currentPos);
 
-        if (playerAudio.getMarker() >= 0)
-        {
-            playerAudio.clearMarker();
-            markerButton.setButtonText("Marker");
-        }
-        else
-        {
-            playerAudio.setMarker(currentPos);
+        markerNames.add("Marker " + juce::String(markerNames.size() + 1));
 
-            
-            int totalSeconds = int(currentPos);
-            int minutes = totalSeconds / 60;
-            int seconds = totalSeconds % 60;
-
-            juce::String timeString = std::to_string(minutes) + ":" + (seconds < 10 ? "0" : "") + std::to_string(seconds);
-
-            markerButton.setButtonText("Marker: " + timeString);
-        }
-        }
-
+        updateMarkerList();
+    }
     else if (button == &gotoMarkerButton)
     {
-        if (playerAudio.getMarker() >= 0)
-            playerAudio.setPosition(playerAudio.getMarker());
-     }
+        int sel = markerListBox.getSelectedRow();
+        if (sel >= 0 && sel < playerAudio.getNumMarkers())
+        {
+            playerAudio.setPosition(playerAudio.getMarker(sel));
+        }
+        else if (playerAudio.getNumMarkers() > 0)
+        {
 
+            playerAudio.setPosition(playerAudio.getMarker(0));
+        }
+    }
 
-
-    
 }
 
 void PlayerGUI::paint(juce::Graphics& g)
@@ -406,17 +485,15 @@ void PlayerGUI::paint(juce::Graphics& g)
         float progress = (float)(playerAudio.getPosition() / totalLength);
         int xPosition = waveformBounds.getX() + (int)(waveformBounds.getWidth() * progress);
         g.setColour(juce::Colours::red);
-        g.drawLine(xPosition, waveformBounds.getY(), xPosition, waveformBounds.getBottom(), 2.0f); 
+        g.drawLine(xPosition, waveformBounds.getY(), xPosition, waveformBounds.getBottom(), 2.0f);
     }
-    double marker = playerAudio.getMarker();
-    if (marker >= 0.0)
-    {
-        juce::Rectangle<int> waveformBounds(20, getHeight() / 2 - 100, 800, 120); 
-        float xPos = waveformBounds.getX() +
-            (float)(marker / playerAudio.getLength() * waveformBounds.getWidth());
+    for (int i = 0; i < playerAudio.getNumMarkers(); i++) {
+        double m = playerAudio.getMarker(i);
+        float xPos = waveformBounds.getX() + (float)(m / playerAudio.getLength() * waveformBounds.getWidth());
         g.setColour(juce::Colours::yellow);
         g.drawLine(xPos, waveformBounds.getY(), xPos, waveformBounds.getBottom(), 2.0f);
     }
+
 
 }
 
@@ -432,7 +509,7 @@ void PlayerGUI::sliderValueChanged(juce::Slider* slider)
         int totalSeconds = int(value);
         int minutes = totalSeconds / 60;
         int seconds = totalSeconds % 60;
-        juce::String timeString = std::to_string(minutes) + " : " + std::to_string(seconds);
+        juce::String timeString = juce::String::formatted("%02d:%02d", minutes, seconds);
 
         currentTimeLabel.setText(timeString, juce::dontSendNotification);
     }
@@ -447,70 +524,47 @@ void PlayerGUI::sliderValueChanged(juce::Slider* slider)
 void PlayerGUI::timerCallback()
 {
     double totalLength = playerAudio.getLength();
+
     if (totalLength > 0.0)
     {
         double currentPosition = playerAudio.getPosition();
         positionSlider.setValue(currentPosition, juce::dontSendNotification);
+
         int currentMinutes = (int)currentPosition / 60;
         int currentSeconds = (int)currentPosition % 60;
-        currentTimeLabel.setText(
-            juce::String::formatted("%02d:%02d", currentMinutes, currentSeconds),
-            juce::dontSendNotification
-        );
+        juce::String timeString = juce::String::formatted("%02d:%02d", currentMinutes, currentSeconds);
+        currentTimeLabel.setText(timeString, juce::dontSendNotification);
+
+
+        if (playerAudio.isAOn() && playerAudio.getLoopA() >= 0.0)
+            setAButton.setButtonText("A \n" + timeString);
+
+        if (playerAudio.isBOn() && playerAudio.getLoopB() > playerAudio.getLoopA())
+            setBButton.setButtonText("B \n" + timeString);
+
+
+        int totalSeconds = (int)totalLength;
+        int minutes = totalSeconds / 60;
+        int seconds = totalSeconds % 60;
+        totalTimeLabel.setText(juce::String::formatted("%02d:%02d", minutes, seconds), juce::dontSendNotification);
+
+
+        if (playerAudio.isABLooping())
+        {
+            if (currentPosition >= playerAudio.getLoopB())
+                playerAudio.setPosition(playerAudio.getLoopA());
+        }
     }
     else
     {
         currentTimeLabel.setText("00:00", juce::dontSendNotification);
         positionSlider.setValue(0.0, juce::dontSendNotification);
     }
-    repaint();
-        positionSlider.setValue(playerAudio.getPosition(), juce::dontSendNotification);
-        double value = positionSlider.getValue();
-        int totalSeconds = int(value);
-        int minutes = totalSeconds / 60;
-        int seconds = totalSeconds % 60;
-        juce::String timeString = std::to_string(minutes) + " : " + std::to_string(seconds);
-        if (playerAudio.isAOn())
-        {
-            if(playerAudio.getLoopB() <= playerAudio.getLoopA() && playerAudio.getLoopB() != -1.0)
-            {
-			}
-            else
-            {
-                playerAudio.toggleA();
-                setAButton.setButtonText("A \n" + timeString);
-            }
-        }
-        if (playerAudio.isBOn())
-        {
-            if (playerAudio.getLoopB() <= playerAudio.getLoopA() && playerAudio.getLoopB() != -1.0)
-            {
-            }
-            else
-            { 
-            playerAudio.toggleB();
-            setBButton.setButtonText("B \n" + timeString);
-            }
-            }
-        currentTimeLabel.setText(timeString, juce::dontSendNotification);
-        value = playerAudio.getLength();
-        totalSeconds = int(value);
-        minutes = totalSeconds / 60;
-        seconds = totalSeconds % 60;
-        timeString = std::to_string(minutes) + " : " + std::to_string(seconds);
 
-        totalTimeLabel.setText(timeString, juce::dontSendNotification);
-    
-    if(playerAudio.isABLooping())
-        {
-        double currentPosition = playerAudio.getPosition();
-        if (currentPosition >= playerAudio.getLength() || currentPosition >= playerAudio.getLoopB())
-        {
-            playerAudio.setPosition(playerAudio.getLoopA());
-        }
-	}
+    repaint();
 }
+
 void PlayerGUI::positionSliderSetVBounds()
 {
     positionSlider.setRange(0, playerAudio.getLength(), 1);
-}  
+}

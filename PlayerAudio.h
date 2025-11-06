@@ -48,9 +48,11 @@ public:
 	void toggleB();
 	bool isAOn() const;
 	bool isBOn() const;
-    void PlayerAudio::setMarker(double pos);
-    double PlayerAudio::getMarker() const;
-    void PlayerAudio::clearMarker();
+    void addMarker(double pos);      
+    void removeMarker(int index);    
+    void clearMarkers();              
+    double getMarker(int index) const; 
+    int getNumMarkers() const;        
 
     
 private:
@@ -69,7 +71,7 @@ private:
 
     juce::Array<juce::File> playlist;  
     int currentIndex = -1; 
-    double markerPosition = -1.0; 
+    juce::Array<double> markers;
 
   
 

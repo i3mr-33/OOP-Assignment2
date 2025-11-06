@@ -3,6 +3,12 @@
 PlayerAudio::PlayerAudio()
 {
     formatManager.registerBasicFormats();
+    markers.clear();     
+    AisOn = false;       
+    BisOn = false;
+    isABLoopingvar = false;
+    loopStart = -1.0;
+    loopEnd = -1.0;
 }
 PlayerAudio::~PlayerAudio()
 {
@@ -41,15 +47,15 @@ bool PlayerAudio::loadFile(const juce::File& file)
     {
         if (auto* reader = formatManager.createReaderFor(file))
         {
-            // 🔑 Disconnect old source first
+           
             transportSource.stop();
             transportSource.setSource(nullptr);
             readerSource.reset();
-            // Audio Waveform
+            
             thumbnail.setSource(new juce::FileInputSource(file));
-            // Create new reader source
+            
             readerSource = std::make_unique<juce::AudioFormatReaderSource>(reader, true);
-            // Attach safely
+           
             transportSource.setSource(readerSource.get(),
                 0,
                 nullptr,
@@ -142,8 +148,7 @@ void PlayerAudio::addToPlaylist(const juce::Array<juce::File>& files)
 
     if (currentIndex == -1 && playlist.size() > 0)
     {
-        currentIndex = 0;
-        loadFile(playlist[currentIndex]);
+        currentIndex = 0 ; 
     }
 }
 
@@ -241,16 +246,26 @@ bool PlayerAudio::isBOn() const
 {
 	return BisOn;
 }
-void PlayerAudio::setMarker(double pos) 
-{ 
-    markerPosition = pos;
+void PlayerAudio::addMarker(double pos) 
+{
+    markers.add(pos); 
 }
-double PlayerAudio::getMarker() const 
+void PlayerAudio::removeMarker(int index) 
 { 
-    return markerPosition;
+    if (index >= 0 && index < markers.size()) 
+        markers.remove(index);
 }
-void PlayerAudio::clearMarker() 
+void PlayerAudio::clearMarkers() 
+{
+    markers.clear(); 
+}
+double PlayerAudio::getMarker(int index) const 
 { 
-    markerPosition = -1.0; 
+    return (index >= 0 && index < markers.size()) ? markers[index] : -1.0; 
 }
+int PlayerAudio::getNumMarkers() const 
+{
+    return markers.size();
+}
+
 
