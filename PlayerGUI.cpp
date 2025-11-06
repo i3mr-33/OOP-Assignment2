@@ -162,12 +162,21 @@ void PlayerGUI::resized()
     loopButton.setBounds(getWidth() - 80, 15, 60, 40);
     muteButton.setBounds(getWidth() - 160, 15, 60, 40);
 
+<<<<<<< HEAD
+
+    backwardButton.setBounds(x - 90, y + 150, 70, 40);
+    goToStartButton.setBounds(x - 180, y + 150, 70, 40);
+    playButton.setBounds(x, y + 150, 70, 40);
+    goToEndButton.setBounds(x + 180, y + 150, 70, 40);
+    forwardButton.setBounds(x + 90, y + 150, 70, 40);
+=======
    
     backwardButton.setBounds(x - 90, y + 270, 70, 40);    
     goToStartButton.setBounds(x - 180, y + 270, 70, 40);
     playButton.setBounds(x , y + 270, 70, 40);
     goToEndButton.setBounds(x + 180, y + 270, 70, 40);
     forwardButton.setBounds(x + 90, y + 270, 70, 40);
+>>>>>>> c61fa5dc795ce8dbcf7644f91e1c8d113ed5f80f
 
     prevButton.setBounds(getWidth() - 160, 60, 60, 40);
     nextButton.setBounds(getWidth() - 80, 60, 60, 40);
@@ -183,12 +192,22 @@ void PlayerGUI::resized()
     metaDataLabel.setBounds(15, 80, getWidth() - 40, 60);
 
     positionSlider.setBounds(60, getHeight() - 40, getWidth() - 130, 30);
+<<<<<<< HEAD
+    volumeSlider.setBounds(getWidth() - 350, y + 130, 350, 30);
+    speedSlider.setBounds(getWidth() - 350, y + 170, 350, 30);
+
+    markerListBox.setBounds(150, 50, 150, 150);
+    markerButton.setBounds(110, 15, 90, 30);
+    gotoMarkerButton.setBounds(210, 15, 90, 30);
+
+=======
     volumeSlider.setBounds(getWidth() - 350, y + 180, 350, 30);
     speedSlider.setBounds(getWidth() - 350, y + 220, 350, 30);
     
 	offcolour = abLoopButton.findColour(juce::TextButton::buttonOnColourId);
     markerButton.setBounds(130, 15, 90, 50);
     gotoMarkerButton.setBounds(240, 15 , 90, 50);
+>>>>>>> c61fa5dc795ce8dbcf7644f91e1c8d113ed5f80f
 
 
 }
