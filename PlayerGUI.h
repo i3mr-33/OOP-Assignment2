@@ -46,6 +46,7 @@ public:
     // shortcuts
     bool keyPressed(const juce::KeyPress& key) override;
     void setupKeyboardShortcuts();
+    
 private:
     PlayerAudio playerAudio;
     CustomLookAndFeel customLookAndFeel;
@@ -79,8 +80,9 @@ private:
     juce::TextButton setBButton{ "Set B" };
     juce::TextButton abLoopButton{ "A-B Loop" };
     juce::TextButton markerButton{ "Marker" };
-    juce::TextButton gotoMarkerButton{ "Go to Marker" };
+    juce::TextButton removeMarkerButton{ "Remove Marker" };
     juce::ListBox markerListBox;
+    juce::Label markerTitleLabel;
 
     
     std::unique_ptr<MarkerListModel> markerModel;

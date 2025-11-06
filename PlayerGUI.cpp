@@ -41,7 +41,7 @@ PlayerGUI::PlayerGUI()
     {
         &loadButton, &loopButton, &playButton, &goToStartButton, &goToEndButton, &muteButton,
         &nextButton, &prevButton , &forwardButton , &backwardButton , &setAButton,
-        &setBButton, &abLoopButton,&markerButton , &gotoMarkerButton
+        &setBButton, &abLoopButton,&markerButton ,& removeMarkerButton
     };
 
     
@@ -58,6 +58,13 @@ PlayerGUI::PlayerGUI()
     markerModel = std::make_unique<MarkerListModel>(markerNames, playerAudio, *this);
     markerListBox.setModel(markerModel.get());
     addAndMakeVisible(markerListBox);
+
+
+    markerTitleLabel.setJustificationType(juce::Justification::centredLeft);
+    markerTitleLabel.setText("Markers:", juce::dontSendNotification); 
+    markerTitleLabel.setColour(juce::Label::textColourId, juce::Colours::white);
+    markerTitleLabel.setFont(juce::Font(18.0f, juce::Font::plain));
+    addAndMakeVisible(markerTitleLabel);
 
     playlistBox.setModel(this); 
     playlistBox.setColour(juce::ListBox::backgroundColourId, juce::Colours::darkgrey);
@@ -173,32 +180,39 @@ void PlayerGUI::resized()
     muteButton.setBounds(getWidth() - 160, 15, 60, 40);
 
 
-    backwardButton.setBounds(x - 90, y + 270, 70, 40);
-    goToStartButton.setBounds(x - 180, y + 270, 70, 40);
-    playButton.setBounds(x, y + 270, 70, 40);
-    goToEndButton.setBounds(x + 180, y + 270, 70, 40);
-    forwardButton.setBounds(x + 90, y + 270, 70, 40);
+    backwardButton.setBounds(120, y + 285, 100, 40);
+    goToStartButton.setBounds(240 , y + 285, 100, 40);
+    playButton.setBounds( getWidth()- 410, y + 285, 100, 40);
+    goToEndButton.setBounds(getWidth() - 170, y + 285, 100, 40);
+    forwardButton.setBounds(getWidth() - 290 , y + 285, 100, 40);
 
     prevButton.setBounds(getWidth() - 160, 60, 60, 40);
     nextButton.setBounds(getWidth() - 80, 60, 60, 40);
-    playlistBox.setBounds(getWidth() - 160, 130, 140, 100);
-    playlistTitleLabel.setBounds(getWidth() - 160, 100, 200, 40);
+    playlistBox.setBounds(15, y + 70,y , 100);
+    playlistTitleLabel.setBounds(15, y + 30 , 200, 40);
 
-    setAButton.setBounds(20, y + 200, 80, 40);
-    setBButton.setBounds(120, y + 200, 80, 40);
-    abLoopButton.setBounds(220, y + 200, 80, 40);
+
+    setAButton.setBounds(430,  y + 70, 80, 45);
+    setBButton.setBounds(515, y + 70, 80, 45);
+    abLoopButton.setBounds(430, y + 120, 165, 45);
 
     currentTimeLabel.setBounds(10, getHeight() - 40, 60, 30);
     totalTimeLabel.setBounds(getWidth() - 70, getHeight() - 40, 60, 30);
     metaDataLabel.setBounds(15, 80, getWidth() - 40, 60);
 
     positionSlider.setBounds(60, getHeight() - 40, getWidth() - 130, 30);
-    volumeSlider.setBounds(getWidth() - 350, y + 180, 350, 30);
-    speedSlider.setBounds(getWidth() - 350, y + 220, 350, 30);
+    volumeSlider.setBounds(15, y + 180, getWidth(), 30);
+    speedSlider.setBounds(15, y + 220, getWidth(), 30);
 
-    markerListBox.setBounds(150, 50, 150, 150);
-    markerButton.setBounds(110, 15, 90, 30);
-    gotoMarkerButton.setBounds(210, 15, 90, 30);
+    
+    markerButton.setBounds(110, 15, 90, 50);
+    removeMarkerButton.setBounds(210, 15, 90, 50);
+
+    
+    markerTitleLabel.setBounds(getWidth() - 160, y + 30 , 200, 40);
+
+    
+    markerListBox.setBounds(getWidth() - 160, y + 70 , 140, 100);
 
     grabKeyboardFocus(); // shortcuts
 
@@ -240,7 +254,7 @@ void PlayerGUI::updateMetaDataLabelWithTagLib(const juce::File& file)
 
 int PlayerGUI::getNumMarkerRows()
 {
-    return markerNames.size();
+    return playerAudio.getNumMarkers();
 }
 
 void PlayerGUI::paintMarkerListBoxItem(int rowNumber, juce::Graphics& g,
@@ -248,7 +262,7 @@ void PlayerGUI::paintMarkerListBoxItem(int rowNumber, juce::Graphics& g,
 {
     g.setColour(rowIsSelected ? juce::Colours::aqua : juce::Colours::white);
 
-    if (rowNumber < markerNames.size())
+    if (rowNumber < playerAudio.getNumMarkers())
     {
         
         double markerPos = playerAudio.getMarker(rowNumber);
@@ -454,26 +468,28 @@ void PlayerGUI::buttonClicked(juce::Button* button)
 
         updateMarkerList();
     }
-    else if (button == &gotoMarkerButton)
+    
+    else if (button == &removeMarkerButton)
     {
-        int sel = markerListBox.getSelectedRow();
-        if (sel >= 0 && sel < playerAudio.getNumMarkers())
-        {
-            playerAudio.setPosition(playerAudio.getMarker(sel));
-        }
-        else if (playerAudio.getNumMarkers() > 0)
-        {
+        int selectedIndex = markerListBox.getSelectedRow();
 
-            playerAudio.setPosition(playerAudio.getMarker(0));
+        if (selectedIndex >= 0 && selectedIndex < playerAudio.getNumMarkers())
+        {
+            playerAudio.removeMarker(selectedIndex);
+            markerNames.remove(selectedIndex);
+            for (int i = selectedIndex; i < markerNames.size(); ++i)
+            {
+                markerNames.set(i, "Marker " + juce::String(i + 1));
+            }
+            updateMarkerList();
         }
     }
-
 }
 
 void PlayerGUI::paint(juce::Graphics& g)
 {
     g.fillAll(juce::Colour(0xFF2B2B2B));
-    juce::Rectangle<int> waveformBounds(40, getHeight() / 2 - 100, 700, 160);
+    juce::Rectangle<int> waveformBounds(40, getHeight() / 2 - 150, 700, 160);
     g.setColour(juce::Colours::black);
     g.fillRect(waveformBounds);
     g.setColour(juce::Colours::white);

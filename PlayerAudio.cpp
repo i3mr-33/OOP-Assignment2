@@ -271,8 +271,7 @@ void PlayerAudio::setMarker(double pos)
     markerPosition = pos;
 }
 void PlayerAudio::removeMarker(int index) 
-{ 
-    if (index >= 0 && index < markers.size()) 
+{  
         markers.remove(index);
 }
 void PlayerAudio::clearMarkers() 
@@ -281,7 +280,7 @@ void PlayerAudio::clearMarkers()
 }
 double PlayerAudio::getMarker(int index) const 
 { 
-    return (index >= 0 && index < markers.size()) ? markers[index] : -1.0; 
+    return markers[index]; 
 }
 int PlayerAudio::getNumMarkers() const 
 {
