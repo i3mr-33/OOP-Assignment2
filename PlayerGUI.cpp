@@ -121,28 +121,28 @@ void PlayerGUI::resized()
     muteButton.setBounds(getWidth() - 160, 15, 60, 40);
 
    
-    backwardButton.setBounds(x - 90, y + 150, 70, 40);    
-    goToStartButton.setBounds(x - 180, y + 150, 70, 40);
-    playButton.setBounds(x , y + 150, 70, 40);
-    goToEndButton.setBounds(x + 180, y + 150, 70, 40);
-    forwardButton.setBounds(x + 90, y + 150, 70, 40);
+    backwardButton.setBounds(x - 90, y + 270, 70, 40);    
+    goToStartButton.setBounds(x - 180, y + 270, 70, 40);
+    playButton.setBounds(x , y + 270, 70, 40);
+    goToEndButton.setBounds(x + 180, y + 270, 70, 40);
+    forwardButton.setBounds(x + 90, y + 270, 70, 40);
 
     prevButton.setBounds(getWidth() - 160, 60, 60, 40);
     nextButton.setBounds(getWidth() - 80, 60, 60, 40);
     playlistBox.setBounds(getWidth() - 160, 130, 140, 100);
     playlistTitleLabel.setBounds(getWidth() - 160, 100, 200, 40);
 
-    setAButton.setBounds(20, y + 80, 80, 40);
-    setBButton.setBounds(120, y + 80, 80, 40);
-    abLoopButton.setBounds(220, y + 80, 80, 40);
+    setAButton.setBounds(20, y + 200, 80, 40);
+    setBButton.setBounds(120, y + 200, 80, 40);
+    abLoopButton.setBounds(220, y + 200, 80, 40);
 
     currentTimeLabel.setBounds(10, getHeight() - 40, 60, 30);
     totalTimeLabel.setBounds(getWidth() - 70, getHeight() - 40, 60, 30);
     metaDataLabel.setBounds(15, 80, getWidth() - 40, 60);
     
     positionSlider.setBounds(60, getHeight() - 40, getWidth() - 130, 30);
-    volumeSlider.setBounds(getWidth() - 350, y + 130, 350, 30);
-    speedSlider.setBounds(getWidth() - 350, y + 170, 350, 30);
+    volumeSlider.setBounds(getWidth() - 350, y + 180, 350, 30);
+    speedSlider.setBounds(getWidth() - 350, y + 220, 350, 30);
     
 	offcolour = abLoopButton.findColour(juce::TextButton::buttonOnColourId);
     markerButton.setBounds(130, 15, 90, 50);
@@ -383,7 +383,7 @@ void PlayerGUI::buttonClicked(juce::Button* button)
 void PlayerGUI::paint(juce::Graphics& g)
 {
     g.fillAll(juce::Colour(0xFF2B2B2B));
-    juce::Rectangle<int> waveformBounds(20, getHeight() / 2 - 100, 800, 120);
+    juce::Rectangle<int> waveformBounds(40, getHeight() / 2 - 100, 700, 160);
     g.setColour(juce::Colours::black);
     g.fillRect(waveformBounds);
     g.setColour(juce::Colours::white);
