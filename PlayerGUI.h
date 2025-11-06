@@ -43,10 +43,9 @@ public:
     PlayerAudio& getPlayerAudio() { return playerAudio; }
 
     void updateMarkerList();
-
-
-
-
+    // shortcuts
+    bool keyPressed(const juce::KeyPress& key) override;
+    void setupKeyboardShortcuts();
 private:
     PlayerAudio playerAudio;
     CustomLookAndFeel customLookAndFeel;
@@ -95,5 +94,7 @@ private:
     int currentlyPlayingRow = -1;
 
     juce::Colour offcolour;
+    // shortcut
+    juce::Array<juce::KeyPress> keyPresses;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PlayerGUI)
 };

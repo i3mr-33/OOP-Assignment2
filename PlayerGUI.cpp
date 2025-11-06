@@ -51,8 +51,10 @@ PlayerGUI::PlayerGUI()
         addAndMakeVisible(btn);
     }
 
-   
-    
+   // shortcuts 
+    setupKeyboardShortcuts();
+    setWantsKeyboardFocus(true);
+
     markerModel = std::make_unique<MarkerListModel>(markerNames, playerAudio, *this);
     markerListBox.setModel(markerModel.get());
     addAndMakeVisible(markerListBox);
@@ -98,8 +100,8 @@ PlayerGUI::PlayerGUI()
     metaDataLabel.setText("No file loaded.", juce::dontSendNotification);
     addAndMakeVisible(metaDataLabel);
     playerAudio.onFileChanged = [this](const juce::File& file) { updateMetaDataLabelWithTagLib(file); };
-
-    
+    // shortcuts
+    setWantsKeyboardFocus(true);
 }
 PlayerGUI::~PlayerGUI()
 {
@@ -198,7 +200,7 @@ void PlayerGUI::resized()
     markerButton.setBounds(110, 15, 90, 30);
     gotoMarkerButton.setBounds(210, 15, 90, 30);
 
-
+    grabKeyboardFocus(); // shortcuts
 
 }
 
@@ -580,4 +582,179 @@ void PlayerGUI::timerCallback()
 void PlayerGUI::positionSliderSetVBounds()
 {
     positionSlider.setRange(0, playerAudio.getLength(), 1);
+}
+
+
+
+// shortcuts 
+
+void PlayerGUI::setupKeyboardShortcuts()
+{
+    // Space: Play/Pause
+    keyPresses.add(juce::KeyPress(' ', juce::ModifierKeys::noModifiers, ' '));
+
+    // L: Load file
+    keyPresses.add(juce::KeyPress('l', juce::ModifierKeys::noModifiers, 'l'));
+
+    // Left Arrow: Skip backward 10s
+    keyPresses.add(juce::KeyPress(juce::KeyPress::leftKey));
+
+    // Right Arrow: Skip forward 10s
+    keyPresses.add(juce::KeyPress(juce::KeyPress::rightKey));
+
+    // Up Arrow: Volume up
+    keyPresses.add(juce::KeyPress(juce::KeyPress::upKey));
+
+    // Down Arrow: Volume down
+    keyPresses.add(juce::KeyPress(juce::KeyPress::downKey));
+
+    // M: Mute/Unmute
+    keyPresses.add(juce::KeyPress('m', juce::ModifierKeys::noModifiers, 'm'));
+
+    // Loop: Ctrl+L 
+    keyPresses.add(juce::KeyPress('l', juce::ModifierKeys::ctrlModifier, 'l'));
+
+    // A-B Loop: Ctrl+Shift+B
+    keyPresses.add(juce::KeyPress('b', juce::ModifierKeys::ctrlModifier | juce::ModifierKeys::shiftModifier, 'b'));
+
+    // Set A Point: Ctrl+A 
+    keyPresses.add(juce::KeyPress('a', juce::ModifierKeys::ctrlModifier, 'a'));
+
+    // Set B Point: Ctrl+B
+    keyPresses.add(juce::KeyPress('b', juce::ModifierKeys::ctrlModifier, 'b'));
+
+    // Next Track: Ctrl+Right 
+    keyPresses.add(juce::KeyPress(juce::KeyPress::rightKey, juce::ModifierKeys::ctrlModifier, 0));
+
+    // Previous Track: Ctrl+Left 
+    keyPresses.add(juce::KeyPress(juce::KeyPress::leftKey, juce::ModifierKeys::ctrlModifier, 0));
+
+    // Speed increase: Ctrl+Up 
+    keyPresses.add(juce::KeyPress(juce::KeyPress::upKey, juce::ModifierKeys::ctrlModifier, 0));
+
+    // Speed decrease: Ctrl+Down 
+    keyPresses.add(juce::KeyPress(juce::KeyPress::downKey, juce::ModifierKeys::ctrlModifier, 0));
+}
+
+bool PlayerGUI::keyPressed(const juce::KeyPress& key)
+{
+    // Space - Play 
+    if (key == juce::KeyPress(' ', juce::ModifierKeys::noModifiers, ' '))
+    {
+        buttonClicked(&playButton);
+        return true;
+    }
+    // Space - Pause 
+    else if (key == juce::KeyPress(' ', juce::ModifierKeys::noModifiers, ' '))
+    {
+        buttonClicked(&pauseButton);
+        return true;
+    }
+    // L - Load file
+    else if (key == juce::KeyPress('l', juce::ModifierKeys::noModifiers, 'l'))
+    {
+        buttonClicked(&loadButton);
+        return true;
+    }
+
+    // Left Arrow - Skip backward 10s
+    else if (key == juce::KeyPress(juce::KeyPress::leftKey))
+    {
+        buttonClicked(&backwardButton);
+        return true;
+    }
+
+    // Right Arrow - Skip forward 10s
+    else if (key == juce::KeyPress(juce::KeyPress::rightKey))
+    {
+        buttonClicked(&forwardButton);
+        return true;
+    }
+
+    // Up Arrow - Volume up
+    else if (key == juce::KeyPress(juce::KeyPress::upKey))
+    {
+        double currentVolume = volumeSlider.getValue();
+        double newVolume = juce::jmin(currentVolume + 0.1, 0.999);
+        volumeSlider.setValue(newVolume);
+        return true;
+    }
+
+    // Down Arrow - Volume down
+    else if (key == juce::KeyPress(juce::KeyPress::downKey))
+    {
+        double currentVolume = volumeSlider.getValue();
+        double newVolume = juce::jmax(currentVolume - 0.1, 0.0);
+        volumeSlider.setValue(newVolume);
+        return true;
+    }
+
+    // M - Mute/Unmute
+    else if (key == juce::KeyPress('m', juce::ModifierKeys::noModifiers, 'm'))
+    {
+        buttonClicked(&muteButton);
+        return true;
+    }
+
+    // Ctrl+L - Loop toggle
+    else if (key == juce::KeyPress('l', juce::ModifierKeys::ctrlModifier, 'l'))
+    {
+        buttonClicked(&loopButton);
+        return true;
+    }
+
+    // Ctrl+Shift+B - A-B Loop toggle
+    else if (key == juce::KeyPress('b', juce::ModifierKeys::ctrlModifier | juce::ModifierKeys::shiftModifier, 'b'))
+    {
+        buttonClicked(&abLoopButton);
+        return true;
+    }
+
+    // Ctrl+A - Set A point
+    else if (key == juce::KeyPress('a', juce::ModifierKeys::ctrlModifier, 'a'))
+    {
+        buttonClicked(&setAButton);
+        return true;
+    }
+
+    // Ctrl+B - Set B point
+    else if (key == juce::KeyPress('b', juce::ModifierKeys::ctrlModifier, 'b'))
+    {
+        buttonClicked(&setBButton);
+        return true;
+    }
+
+    // Ctrl+Right - Next track
+    else if (key == juce::KeyPress(juce::KeyPress::rightKey, juce::ModifierKeys::ctrlModifier, 0))
+    {
+        buttonClicked(&goToEndButton);
+        return true;
+    }
+
+    // Ctrl+Left - Previous track
+    else if (key == juce::KeyPress(juce::KeyPress::leftKey, juce::ModifierKeys::ctrlModifier, 0))
+    {
+        buttonClicked(&goToStartButton);
+        return true;
+    }
+
+    // Ctrl+Up - Speed increase
+    else if (key == juce::KeyPress(juce::KeyPress::upKey, juce::ModifierKeys::ctrlModifier, 0))
+    {
+        double currentSpeed = speedSlider.getValue();
+        double newSpeed = juce::jmin(currentSpeed + 0.1, 3.0);
+        speedSlider.setValue(newSpeed);
+        return true;
+    }
+
+    // Ctrl+Down - Speed decrease
+    else if (key == juce::KeyPress(juce::KeyPress::downKey, juce::ModifierKeys::ctrlModifier, 0))
+    {
+        double currentSpeed = speedSlider.getValue();
+        double newSpeed = juce::jmax(currentSpeed - 0.1, 0.5);
+        speedSlider.setValue(newSpeed);
+        return true;
+    }
+
+    return false;
 }
