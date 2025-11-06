@@ -186,7 +186,7 @@ void PlayerGUI::resized()
     volumeSlider.setBounds(getWidth() - 350, y + 180, 350, 30);
     speedSlider.setBounds(getWidth() - 350, y + 220, 350, 30);
     
-	offcolour = abLoopButton.findColour(juce::TextButton::buttonOnColourId);
+    markerListBox.setBounds(150 , 50, 205, 150);
     markerButton.setBounds(130, 15, 90, 50);
     gotoMarkerButton.setBounds(240, 15 , 90, 50);
 

@@ -249,9 +249,10 @@ bool PlayerAudio::isBOn() const
 {
 	return BisOn;
 }
-void PlayerAudio::addMarker(double pos) 
+void PlayerAudio::addMarker(double pos)
 {
-    markers.add(pos); 
+    markers.add(pos);
+}
 
 juce::String PlayerAudio::getLastLoadedFilePath() const
 {

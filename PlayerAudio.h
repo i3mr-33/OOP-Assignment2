@@ -57,9 +57,7 @@ public:
     void setPlaybackPositionInSeconds(double pos);
     double getPlaybackPositionInSeconds() const;
     void PlayerAudio::setMarker(double pos);
-    double PlayerAudio::getMarker() const;
-    void PlayerAudio::clearMarker();
-
+    
     
 private:
 	double loopStart = -1.0;
@@ -74,7 +72,7 @@ private:
     juce::AudioFormatManager formatManager;
     std::unique_ptr<juce::AudioFormatReaderSource> readerSource;
     juce::AudioTransportSource transportSource;
-
+    double markerPosition = -1.0; 
     juce::Array<juce::File> playlist;  
     int currentIndex = -1; 
     juce::Array<double> markers;
