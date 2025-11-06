@@ -56,9 +56,6 @@ bool PlayerAudio::loadFile(const juce::File& file)
             
             readerSource = std::make_unique<juce::AudioFormatReaderSource>(reader, true);
            
-            // add update to last file
-            lastLoadedFile = file;
-            // Attach safely
             transportSource.setSource(readerSource.get(),
                 0,
                 nullptr,
@@ -249,6 +246,7 @@ bool PlayerAudio::isBOn() const
 {
 	return BisOn;
 }
+
 void PlayerAudio::addMarker(double pos)
 {
     markers.add(pos);

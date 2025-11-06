@@ -48,16 +48,20 @@ public:
 	void toggleB();
 	bool isAOn() const;
 	bool isBOn() const;
+
     void addMarker(double pos);      
     void removeMarker(int index);    
     void clearMarkers();              
     double getMarker(int index) const; 
     int getNumMarkers() const;        
+
     juce::String getLastLoadedFilePath() const; 
     void setPlaybackPositionInSeconds(double pos);
     double getPlaybackPositionInSeconds() const;
     void PlayerAudio::setMarker(double pos);
     
+
+
     
 private:
 	double loopStart = -1.0;
