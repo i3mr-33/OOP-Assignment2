@@ -18,7 +18,13 @@ public:
     {
         playerGUI.paintMarkerListBoxItem(rowNumber, g, width, height, rowIsSelected);
     }
-
+    void listBoxItemClicked(int rowNumber, const juce::MouseEvent& ) override
+    {
+        if (rowNumber >= 0 && rowNumber < playerAudio.getNumMarkers())
+        {
+            playerAudio.setPosition(playerAudio.getMarker(rowNumber));
+        }
+    }
 private:
     juce::StringArray& markerNames;
     PlayerAudio& playerAudio;
@@ -28,6 +34,7 @@ private:
 
 PlayerGUI::PlayerGUI()
 {
+    markerListBox.setRowHeight(25);
     setLookAndFeel(&customLookAndFeel);
     
     juce::TextButton* buttons[] =
@@ -92,6 +99,7 @@ PlayerGUI::PlayerGUI()
     addAndMakeVisible(metaDataLabel);
     playerAudio.onFileChanged = [this](const juce::File& file) { updateMetaDataLabelWithTagLib(file); };
 
+    
 }
 PlayerGUI::~PlayerGUI()
 {
@@ -163,11 +171,11 @@ void PlayerGUI::resized()
     muteButton.setBounds(getWidth() - 160, 15, 60, 40);
 
 
-    backwardButton.setBounds(x - 90, y + 150, 70, 40);
-    goToStartButton.setBounds(x - 180, y + 150, 70, 40);
-    playButton.setBounds(x, y + 150, 70, 40);
-    goToEndButton.setBounds(x + 180, y + 150, 70, 40);
-    forwardButton.setBounds(x + 90, y + 150, 70, 40);
+    backwardButton.setBounds(x - 90, y + 270, 70, 40);
+    goToStartButton.setBounds(x - 180, y + 270, 70, 40);
+    playButton.setBounds(x, y + 270, 70, 40);
+    goToEndButton.setBounds(x + 180, y + 270, 70, 40);
+    forwardButton.setBounds(x + 90, y + 270, 70, 40);
 
     prevButton.setBounds(getWidth() - 160, 60, 60, 40);
     nextButton.setBounds(getWidth() - 80, 60, 60, 40);
@@ -183,8 +191,8 @@ void PlayerGUI::resized()
     metaDataLabel.setBounds(15, 80, getWidth() - 40, 60);
 
     positionSlider.setBounds(60, getHeight() - 40, getWidth() - 130, 30);
-    volumeSlider.setBounds(getWidth() - 350, y + 130, 350, 30);
-    speedSlider.setBounds(getWidth() - 350, y + 170, 350, 30);
+    volumeSlider.setBounds(getWidth() - 350, y + 180, 350, 30);
+    speedSlider.setBounds(getWidth() - 350, y + 220, 350, 30);
 
     markerListBox.setBounds(150, 50, 150, 150);
     markerButton.setBounds(110, 15, 90, 30);
@@ -258,6 +266,7 @@ void PlayerGUI::updateMarkerList()
 {
     
     markerListBox.updateContent();
+    markerListBox.getViewport()->resized();
     markerListBox.repaint();
 }
 
@@ -537,11 +546,15 @@ void PlayerGUI::timerCallback()
 
 
         if (playerAudio.isAOn() && playerAudio.getLoopA() >= 0.0)
+        {
             setAButton.setButtonText("A \n" + timeString);
-
+            playerAudio.toggleA();
+        }
         if (playerAudio.isBOn() && playerAudio.getLoopB() > playerAudio.getLoopA())
+        {
             setBButton.setButtonText("B \n" + timeString);
-
+            playerAudio.toggleB();
+        }
 
         int totalSeconds = (int)totalLength;
         int minutes = totalSeconds / 60;
