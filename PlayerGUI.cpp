@@ -182,19 +182,19 @@ void PlayerGUI::resized()
 
     backwardButton.setBounds(250, y + 285, 100, 40);
     goToStartButton.setBounds(130 , y + 285, 100, 40);
-    playButton.setBounds( getWidth()- 430, y + 285, 100, 40);
+    playButton.setBounds( getWidth()/2 - 40, y + 285, 100, 40);
     goToEndButton.setBounds(getWidth() - 190, y + 285, 100, 40);
     forwardButton.setBounds(getWidth() - 310 , y + 285, 100, 40);
 
     prevButton.setBounds(getWidth() - 160, 60, 60, 40);
     nextButton.setBounds(getWidth() - 80, 60, 60, 40);
-    playlistBox.setBounds(15, y + 70,y , 100);
+    playlistBox.setBounds(15, y + 70,getWidth()/2 - 50, 100);
     playlistTitleLabel.setBounds(15, y + 30 , 200, 40);
 
 
-    setAButton.setBounds(430,  y + 70, 80, 45);
-    setBButton.setBounds(515, y + 70, 80, 45);
-    abLoopButton.setBounds(430, y + 120, 165, 45);
+    setAButton.setBounds(getWidth() / 2 - 20, y + 70, 80, 45);
+    setBButton.setBounds(getWidth() / 2  + 65, y + 70, 80, 45);
+    abLoopButton.setBounds(getWidth() / 2 - 20, y + 120, 165, 45);
 
     currentTimeLabel.setBounds(10, getHeight() - 40, 60, 30);
     totalTimeLabel.setBounds(getWidth() - 70, getHeight() - 40, 60, 30);
@@ -489,7 +489,7 @@ void PlayerGUI::buttonClicked(juce::Button* button)
 void PlayerGUI::paint(juce::Graphics& g)
 {
     g.fillAll(juce::Colour(0xFF2B2B2B));
-    juce::Rectangle<int> waveformBounds(40, getHeight() / 2 - 200, 700, 160);
+    juce::Rectangle<int> waveformBounds(40, getHeight() / 2 - 200, getWidth() - 80, 160);
     g.setColour(juce::Colours::black);
     g.fillRect(waveformBounds);
     g.setColour(juce::Colours::white);
