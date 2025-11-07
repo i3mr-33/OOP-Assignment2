@@ -180,11 +180,11 @@ void PlayerGUI::resized()
     muteButton.setBounds(getWidth() - 160, 15, 60, 40);
 
 
-    backwardButton.setBounds(120, y + 285, 100, 40);
-    goToStartButton.setBounds(240 , y + 285, 100, 40);
-    playButton.setBounds( getWidth()- 410, y + 285, 100, 40);
-    goToEndButton.setBounds(getWidth() - 170, y + 285, 100, 40);
-    forwardButton.setBounds(getWidth() - 290 , y + 285, 100, 40);
+    backwardButton.setBounds(250, y + 285, 100, 40);
+    goToStartButton.setBounds(130 , y + 285, 100, 40);
+    playButton.setBounds( getWidth()- 430, y + 285, 100, 40);
+    goToEndButton.setBounds(getWidth() - 190, y + 285, 100, 40);
+    forwardButton.setBounds(getWidth() - 310 , y + 285, 100, 40);
 
     prevButton.setBounds(getWidth() - 160, 60, 60, 40);
     nextButton.setBounds(getWidth() - 80, 60, 60, 40);
@@ -201,18 +201,18 @@ void PlayerGUI::resized()
     metaDataLabel.setBounds(15, 80, getWidth() - 40, 60);
 
     positionSlider.setBounds(60, getHeight() - 40, getWidth() - 130, 30);
-    volumeSlider.setBounds(15, y + 180, getWidth(), 30);
-    speedSlider.setBounds(15, y + 220, getWidth(), 30);
+    volumeSlider.setBounds(15, y + 180, getWidth() - 20, 30);
+    speedSlider.setBounds(15, y + 220, getWidth() - 20, 30);
 
     
-    markerButton.setBounds(110, 15, 90, 50);
-    removeMarkerButton.setBounds(210, 15, 90, 50);
+    markerButton.setBounds(getWidth() - 160, y - 10, 70, 40);
+    removeMarkerButton.setBounds(getWidth() - 80, y - 10, 70, 40);
 
     
     markerTitleLabel.setBounds(getWidth() - 160, y + 30 , 200, 40);
 
     
-    markerListBox.setBounds(getWidth() - 160, y + 70 , 140, 100);
+    markerListBox.setBounds(getWidth() - 160, y + 70 , 150, 100);
 
     grabKeyboardFocus(); // shortcuts
 
@@ -489,7 +489,7 @@ void PlayerGUI::buttonClicked(juce::Button* button)
 void PlayerGUI::paint(juce::Graphics& g)
 {
     g.fillAll(juce::Colour(0xFF2B2B2B));
-    juce::Rectangle<int> waveformBounds(40, getHeight() / 2 - 150, 700, 160);
+    juce::Rectangle<int> waveformBounds(40, getHeight() / 2 - 200, 700, 160);
     g.setColour(juce::Colours::black);
     g.fillRect(waveformBounds);
     g.setColour(juce::Colours::white);

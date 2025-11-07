@@ -79,7 +79,7 @@ private:
     juce::TextButton setAButton{ "Set A" };
     juce::TextButton setBButton{ "Set B" };
     juce::TextButton abLoopButton{ "A-B Loop" };
-    juce::TextButton markerButton{ "Marker" };
+    juce::TextButton markerButton{ "Set Marker" };
     juce::TextButton removeMarkerButton{ "Remove Marker" };
     juce::ListBox markerListBox;
     juce::Label markerTitleLabel;
