@@ -180,11 +180,11 @@ void PlayerGUI::resized()
     muteButton.setBounds(getWidth() - 160, 15, 60, 40);
 
 
-    backwardButton.setBounds(250, y + 285, 100, 40);
-    goToStartButton.setBounds(130 , y + 285, 100, 40);
-    playButton.setBounds( getWidth()/2 - 40, y + 285, 100, 40);
-    goToEndButton.setBounds(getWidth() - 190, y + 285, 100, 40);
-    forwardButton.setBounds(getWidth() - 310 , y + 285, 100, 40);
+    backwardButton.setBounds(165, y + 285, 80, 40);
+    goToStartButton.setBounds(65 , y + 285, 80, 40);
+    playButton.setBounds( getWidth()/2 - 50, y + 285, 80, 40);
+    goToEndButton.setBounds(getWidth() - 160, y + 285, 80, 40);
+    forwardButton.setBounds(getWidth() - 260 , y + 285, 80, 40);
 
     prevButton.setBounds(getWidth() - 160, 60, 60, 40);
     nextButton.setBounds(getWidth() - 80, 60, 60, 40);
