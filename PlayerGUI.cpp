@@ -299,14 +299,12 @@ void PlayerGUI::buttonClicked(juce::Button* button)
                 auto file = chooser.getResult();
                 if (file.existsAsFile())
                 {
-                    // Add to playlist & load
-                    playlistItems.add(file.getFileName());
-                    playlistBox.updateContent();
-                    playlistBox.repaint();
+                    
+                    playlistItems.add(file.getFileName()); 
                     playerAudio.addToPlaylist({ file });
                     playerAudio.loadFile(file);
-                    currentlyPlayingRow = playerAudio.getCurrentIndex();
-
+    
+                    currentlyPlayingRow = playlistItems.size() - 1;
                     playlistBox.updateContent();
                     playlistBox.repaint();
 
