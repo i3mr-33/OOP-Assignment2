@@ -8,7 +8,7 @@ MainComponent::MainComponent()
 	addAndMakeVisible(player2);
     addAndMakeVisible(masterVolumeSlider);
     masterVolumeSlider.setRange(0.0, 1.0, 0.01);
-    masterVolumeSlider.setValue(0.8);
+    masterVolumeSlider.setValue(0.6);
     masterVolumeSlider.setSliderStyle(juce::Slider::LinearHorizontal);
     masterVolumeSlider.addListener(this);
     addAndMakeVisible(masterVolumeLabel);
@@ -47,21 +47,20 @@ MainComponent::MainComponent()
 MainComponent::~MainComponent()
 {
     juce::String stateToSave;
-    // collect data player 1
+    
     stateToSave << player1.getPlayerAudio().getLastLoadedFilePath() << "\n";
     stateToSave << player1.getPlayerAudio().getPlaybackPositionInSeconds() << "\n";
-    // collect data player 2
+    
     stateToSave << player2.getPlayerAudio().getLastLoadedFilePath() << "\n";
     stateToSave << player2.getPlayerAudio().getPlaybackPositionInSeconds() << "\n";
-    // save in file 
+    
     auto saveFile = getSessionSaveFile();
     saveFile.replaceWithText(stateToSave);
     shutdownAudio();
 }
 void MainComponent::paint(juce::Graphics& g)
 {
-    // Fill the background with the dark color from your LookAndFeel
-    // This will cover the light green
+    
     g.fillAll(juce::Colour(0xFF2B2B2B));
  
 }

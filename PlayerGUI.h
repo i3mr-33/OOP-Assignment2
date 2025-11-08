@@ -43,7 +43,7 @@ public:
     PlayerAudio& getPlayerAudio() { return playerAudio; }
 
     void updateMarkerList();
-    // shortcuts
+
     bool keyPressed(const juce::KeyPress& key) override;
     void setupKeyboardShortcuts();
     
@@ -55,7 +55,7 @@ private:
     juce::TextButton loadButton{ "Load File" };
     juce::TextButton loopButton{ juce::CharPointer_UTF8(u8"➡️") };
     juce::TextButton pauseButton{ juce::CharPointer_UTF8(u8"⏸️") };
-    juce::TextButton playButton{ juce::CharPointer_UTF8(u8"▶️") };
+    juce::TextButton playButton{ juce::CharPointer_UTF8(u8"⏸️") };
     juce::TextButton goToStartButton{ juce::CharPointer_UTF8(u8"⏮️") };
     juce::TextButton goToEndButton{ juce::CharPointer_UTF8(u8"⏭️") };
     juce::TextButton muteButton{ juce::CharPointer_UTF8(u8"🔊") };
@@ -96,7 +96,7 @@ private:
     int currentlyPlayingRow = -1;
 
     juce::Colour offcolour;
-    // shortcut
+
     juce::Array<juce::KeyPress> keyPresses;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PlayerGUI)
 };

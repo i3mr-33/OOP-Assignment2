@@ -51,7 +51,6 @@ PlayerGUI::PlayerGUI()
         addAndMakeVisible(btn);
     }
 
-   // shortcuts 
     setupKeyboardShortcuts();
     setWantsKeyboardFocus(true);
 
@@ -107,7 +106,7 @@ PlayerGUI::PlayerGUI()
     metaDataLabel.setText("No file loaded.", juce::dontSendNotification);
     addAndMakeVisible(metaDataLabel);
     playerAudio.onFileChanged = [this](const juce::File& file) { updateMetaDataLabelWithTagLib(file); };
-    // shortcuts
+
     setWantsKeyboardFocus(true);
 }
 PlayerGUI::~PlayerGUI()
@@ -343,9 +342,9 @@ void PlayerGUI::buttonClicked(juce::Button* button)
     {
         playerAudio.toggleRunning();
         if (playerAudio.isRunning())
-            playButton.setButtonText(juce::CharPointer_UTF8(u8"▶️"));
-        else
             playButton.setButtonText(juce::CharPointer_UTF8(u8"⏸️"));
+        else
+            playButton.setButtonText(juce::CharPointer_UTF8(u8"▶️"));
     }
     else if (button == &goToStartButton)
     {

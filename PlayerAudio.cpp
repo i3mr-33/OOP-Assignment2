@@ -62,6 +62,7 @@ bool PlayerAudio::loadFile(const juce::File& file)
                 reader->sampleRate);
             transportSource.start();
         }
+        lastLoadedFile = file;
     }
     return true;
 }
