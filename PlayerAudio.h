@@ -1,7 +1,7 @@
 ﻿#pragma once							// PlayerAudio.h
 #include <JuceHeader.h>
 
-class PlayerAudio
+class PlayerAudio : public juce::ChangeListener
 {
 public:
     PlayerAudio();
@@ -61,6 +61,7 @@ public:
     void PlayerAudio::setMarker(double pos);
     
 
+    void changeListenerCallback(juce::ChangeBroadcaster* source) override;
 
     
 private:

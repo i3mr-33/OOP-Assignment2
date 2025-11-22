@@ -105,7 +105,13 @@ PlayerGUI::PlayerGUI()
     metaDataLabel.setFont(juce::Font(16.0f));
     metaDataLabel.setText("No file loaded.", juce::dontSendNotification);
     addAndMakeVisible(metaDataLabel);
-    playerAudio.onFileChanged = [this](const juce::File& file) { updateMetaDataLabelWithTagLib(file); };
+    playerAudio.onFileChanged = [this](const juce::File& file)
+        {
+          updateMetaDataLabelWithTagLib(file);
+          currentlyPlayingRow = playerAudio.getCurrentIndex();
+          playlistBox.updateContent();
+          playlistBox.repaint();
+        };
 
     setWantsKeyboardFocus(true);
 }

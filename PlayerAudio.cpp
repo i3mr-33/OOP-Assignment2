@@ -3,6 +3,7 @@
 PlayerAudio::PlayerAudio()
 {
     formatManager.registerBasicFormats();
+    transportSource.addChangeListener(this);
     markers.clear();     
     AisOn = false;       
     BisOn = false;
@@ -12,6 +13,7 @@ PlayerAudio::PlayerAudio()
 }
 PlayerAudio::~PlayerAudio()
 {
+    transportSource.removeChangeListener(this);
 }
 void PlayerAudio::prepareToPlay(int samplesPerBlockExpected, double sampleRate)
 {
@@ -43,28 +45,31 @@ void PlayerAudio::setPlaybackSpeed(double ratio)
 }
 bool PlayerAudio::loadFile(const juce::File& file)
 {
-    if (file.existsAsFile())
+    auto* reader = formatManager.createReaderFor(file);
+
+    if (reader != nullptr)
     {
-        if (auto* reader = formatManager.createReaderFor(file))
-        {
-           
-            transportSource.stop();
-            transportSource.setSource(nullptr);
-            readerSource.reset();
-            
-            thumbnail.setSource(new juce::FileInputSource(file));
-            
-            readerSource = std::make_unique<juce::AudioFormatReaderSource>(reader, true);
-           
-            transportSource.setSource(readerSource.get(),
-                0,
-                nullptr,
-                reader->sampleRate);
-            transportSource.start();
-        }
+        std::unique_ptr<juce::AudioFormatReaderSource> newSource(new juce::AudioFormatReaderSource(reader, true));
+        transportSource.setSource(
+            newSource.get(),
+            0,
+            nullptr,
+            reader->sampleRate
+        );
+
+        readerSource.reset(newSource.release());
         lastLoadedFile = file;
+
+        thumbnail.setSource(new juce::FileInputSource(file));
+        transportSource.start();
+
+        if (onFileChanged)
+            onFileChanged(lastLoadedFile);   
+
+        return true;
     }
-    return true;
+
+    return false;
 }
 void PlayerAudio::start()
 {
@@ -287,5 +292,22 @@ int PlayerAudio::getNumMarkers() const
 {
     return markers.size();
 }
-
+void PlayerAudio::changeListenerCallback(juce::ChangeBroadcaster* source)   
+{
+    if (source == &transportSource)
+    {
+        if (transportSource.hasStreamFinished())
+        {
+            if (looping)
+            {
+                transportSource.setPosition(0.0);
+                transportSource.start();
+            }
+            else
+            {
+                playNext();
+            }
+        }
+    }
+}
 
